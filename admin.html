@@ -9,7 +9,6 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen p-6">
     <div class="max-w-6xl mx-auto">
         
-        <!-- Header -->
         <header class="border-b border-slate-800 pb-4 mb-8 flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
             <div>
                 <h1 class="text-3xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">🦆 SHOPYY FULL AUTO-AI CATALOG</h1>
@@ -21,7 +20,6 @@
         </header>
 
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
-            <!-- Left Side: Product Form -->
             <section class="xl:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl h-fit">
                 <div class="flex items-start justify-between gap-4 mb-4">
                     <div>
@@ -31,7 +29,7 @@
                     <span class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-full">FREE LOCAL MODE</span>
                 </div>
 
-                <form id="aiSyncForm" class="space-y-4">
+                <form id="aiSyncForm" class="space-y-4" onsubmit="return false;">
                     <div>
                         <label class="block text-xs uppercase font-bold text-slate-400 mb-1.5">AI Image Engine</label>
                         <select id="providerInput" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500">
@@ -39,7 +37,7 @@
                             <option value="Canva-style AI">Canva-style AI auto design</option>
                             <option value="Browser AI">Browser AI free generator</option>
                         </select>
-                    </p>
+                        <p class="text-[11px] text-slate-500 mt-1">This static app uses a free in-browser generator. Real Gemini/Canva APIs need official keys.</p>
                     </div>
 
                     <div>
@@ -78,21 +76,20 @@
 
                     <div>
                         <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Extra AI Instructions (Optional)</label>
-                        <textarea id="notesInput" rows="3" placeholder="e.g., luxury style, organic spices, festival offer, kids friendly..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500 resize-none"></textarea>
+                        <textarea id="notesInput" rows="3" placeholder="e.g., luxury style, organic spices, festival offer..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500 resize-none"></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <button type="button" id="generatePreviewBtn" class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-black py-3 rounded-xl hover:bg-slate-700 transition-all">
                             🎨 Auto Generate Preview
                         </button>
-                        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black py-3 rounded-xl hover:opacity-90 transition-all shadow-lg">
+                        <button type="button" id="submitBtn" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black py-3 rounded-xl hover:opacity-90 transition-all shadow-lg">
                             ⚡ Save & Live Sync
                         </button>
                     </div>
                 </form>
             </section>
 
-            <!-- Right Side: AI Preview Sandbox -->
             <section class="xl:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between min-h-[560px]">
                 <div>
                     <div class="flex items-center justify-between gap-4 mb-4">
@@ -135,16 +132,13 @@
         </div>
     </div>
 
-    <!-- Script / Logic -->
     <script>
         const STORAGE_KEY = 'shopyy_products';
         const screenshotInput = document.getElementById('screenshotInput');
         const imagePreview = document.getElementById('imagePreview');
         const uploadPlaceholder = document.getElementById('uploadPlaceholder');
         let selectedImageData = '';
-        let lastGeneratedProduct = null;
 
-        // Image Selection Handler
         screenshotInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -179,14 +173,13 @@
             const stockLine = quantity > 0 ? `${quantity.toLocaleString('en-IN')} pieces are ready for quick delivery` : 'limited stock is available now';
             const notesLine = notes ? ` AI focus: ${notes}.` : ' AI focus: premium look, clear value, and fast buying confidence.';
 
-            return `${title} is a premium Shopyy product generated with ${provider}. It is presented ${offerLine}, crafted to look attractive in your live catalog, and optimized for customers who want quality without confusion. ${stockLine}. ${notesLine}`;
+            return `${title} is a premium Shopyy product generated with ${provider}. It is presented ${offerLine}, crafted to look attractive in your live catalog, and optimized for customers who want quality without confusion. ${stockLine}.${notesLine}`;
         }
 
         function hashText(text) {
             return Array.from(text).reduce((hash, char) => ((hash << 5) - hash + char.charCodeAt(0)) | 0, 0);
         }
 
-        // Cross-Browser safe Base64 SVG Generation
         function generateSVGImage({ title, price, provider, notes }) {
             const seed = Math.abs(hashText(`${title}-${provider}-${notes}`));
             const hueA = seed % 360;
@@ -221,7 +214,7 @@
                     <text x="450" y="737" text-anchor="middle" fill="#fff" font-size="28" font-weight="800" font-family="Arial, sans-serif">${safeProvider}</text>
                 </svg>`;
 
-            return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+            return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
         }
 
         function createProduct() {
@@ -246,55 +239,75 @@
             };
         }
 
-        // Preview Trigger
+        function showPreview(product) {
+            document.getElementById('outputImage').src = product.image;
+            document.getElementById('outputTitle').innerText = product.title;
+            document.getElementById('outputPrice').innerText = `₹${product.price.toLocaleString('en-IN')}`;
+            document.getElementById('outputQty').innerText = product.quantity.toLocaleString('en-IN');
+            document.getElementById('outputDesc').innerText = product.description;
+            document.getElementById('outputProvider').innerText = product.provider;
+            document.getElementById('outputImageStatus').innerText = product.imageStatus;
+            document.getElementById('sandboxEmpty').classList.add('hidden');
+            document.getElementById('sandboxOutput').classList.remove('hidden');
+        }
+
+        function saveProduct(product) {
+            const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            db.push(product);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        }
+
+        // Fix 1: Auto Preview generation logic
         document.getElementById('generatePreviewBtn').addEventListener('click', () => {
-            lastGeneratedProduct = createProduct();
-            if (lastGeneratedProduct) {
-                document.getElementById('outputImage').src = lastGeneratedProduct.image;
-                document.getElementById('outputTitle').innerText = lastGeneratedProduct.title;
-                document.getElementById('outputPrice').innerText = `₹${lastGeneratedProduct.price.toLocaleString('en-IN')}`;
-                document.getElementById('outputQty').innerText = lastGeneratedProduct.quantity.toLocaleString('en-IN');
-                document.getElementById('outputDesc').innerText = lastGeneratedProduct.description;
-                document.getElementById('outputProvider').innerText = lastGeneratedProduct.provider;
-                document.getElementById('outputImageStatus').innerText = lastGeneratedProduct.imageStatus;
-                document.getElementById('sandboxEmpty').classList.add('hidden');
-                document.getElementById('sandboxOutput').classList.remove('hidden');
+            const product = createProduct();
+            if (product) {
+                showPreview(product);
+                document.getElementById('successToast').classList.add('hidden'); // Clear previous flash
             }
         });
 
-        // Submit and Sync Trigger
-        document.getElementById('aiSyncForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        // Fix 2: Click handling optimization to prevent immediate structural reset
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const form = document.getElementById('aiSyncForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             btn.innerText = '🤖 Generating & syncing...';
             btn.disabled = true;
 
             setTimeout(() => {
-                lastGeneratedProduct = createProduct();
-                if (lastGeneratedProduct) {
-                    const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                    db.push(lastGeneratedProduct);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+                const product = createProduct();
+                if (product) {
+                    showPreview(product);
+                    saveProduct(product);
                     
                     document.getElementById('successToast').classList.remove('hidden');
-                    this.reset();
+                    
+                    // Form fields state reset
+                    form.reset();
                     selectedImageData = '';
                     imagePreview.src = '';
                     imagePreview.classList.add('hidden');
                     uploadPlaceholder.classList.remove('hidden');
                 }
+
                 btn.innerText = '⚡ Save & Live Sync';
                 btn.disabled = false;
-            }, 500);
+            }, 600);
         });
 
-        // Clear Catalog Functionality
+        // Clear catalog logic across keys
         document.getElementById('clearCatalogBtn').addEventListener('click', () => {
             if (!confirm('Clear all saved Shopyy products from this browser?')) return;
             localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem('batak_products');
+            localStorage.removeItem('shopyy_productss');
             document.getElementById('successToast').classList.add('hidden');
-            document.getElementById('sandboxEmpty').classList.remove('hidden');
             document.getElementById('sandboxOutput').classList.add('hidden');
+            document.getElementById('sandboxEmpty').classList.remove('hidden');
             alert('Catalog cleared from this browser.');
         });
     </script>
