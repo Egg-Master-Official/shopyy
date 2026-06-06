@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxury Control Studio - Admin Panel</title>
+    <title>Luxury Control Studio - AI Screenshot Poster Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +25,6 @@
             border: 1px solid var(--glass-border);
             box-shadow: 0 20px 40px rgba(0,0,0,0.7);
         }
-        /* Custom Input Styling */
         .premium-input {
             background: rgba(10, 10, 12, 0.8) !important;
             border: 1px solid rgba(212, 175, 55, 0.2) !important;
@@ -44,10 +43,10 @@
         <!-- Header -->
         <header class="glassmorphism rounded-2xl p-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <i class="fa-solid fa-user-gear text-2xl text-[var(--luxury-gold)]"></i>
+                <i class="fa-solid fa-wand-magic-sparkles text-2xl text-[var(--luxury-gold)]"></i>
                 <div>
-                    <h1 class="luxury-heading text-xl md:text-2xl font-black tracking-widest text-white">LUXÈ <span class="text-[#D4AF37]">CONTROL PANEL</span></h1>
-                    <p class="text-xs text-slate-400">Generate premium products, verify state flow & upload to active catalog</p>
+                    <h1 class="luxury-heading text-xl md:text-2xl font-black tracking-widest text-white">LUXÈ <span class="text-[#D4AF37]">POSTER BRANDING ENGINE</span></h1>
+                    <p class="text-xs text-slate-400">Upload item screenshot to auto-generate luxury themed branding marketing posters</p>
                 </div>
             </div>
             <a href="index.html" class="glassmorphism px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-[#D4AF37] transition-all flex items-center gap-2">
@@ -58,48 +57,69 @@
         <!-- Main Workspace -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- Left Side: Product Generation Form -->
+            <!-- Left Side: Screenshot Upload & Target Settings -->
             <section class="lg:col-span-5 glassmorphism rounded-3xl p-6 h-fit space-y-5">
                 <h2 class="luxury-heading text-lg font-bold text-white border-b border-slate-800 pb-3 flex justify-between items-center">
-                    <span><i class="fa-solid fa-wand-magic-sparkles mr-2 text-[#D4AF37]"></i>AI Input Module</span>
-                    <span class="text-[10px] bg-amber-500/10 text-[#D4AF37] border border-amber-500/20 px-2 py-0.5 rounded-full">ULTRA PRO</span>
+                    <span><i class="fa-solid fa-camera mr-2 text-[#D4AF37]"></i>Source Screenshot</span>
+                    <span class="text-[10px] bg-amber-500/10 text-[#D4AF37] border border-amber-500/20 px-2 py-0.5 rounded-full">AI TARGET LOCK</span>
                 </h2>
 
-                <form id="productForm" class="space-y-4" onsubmit="event.preventDefault();">
+                <form id="posterForm" class="space-y-4" onsubmit="event.preventDefault();">
+                    
+                    <!-- CRITICAL: SCREENSHOT DROPZONE OPTION -->
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Product Title</label>
-                        <input type="text" id="prodTitle" placeholder="e.g., MATTE BLACK CHRONO" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Upload Product Screenshot</label>
+                        <div class="border-2 border-dashed border-slate-700 hover:border-[#D4AF37]/50 rounded-xl p-4 text-center bg-slate-950/60 cursor-pointer relative transition-all min-h-[150px] flex flex-col justify-center items-center group">
+                            <input type="file" id="screenshotInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required />
+                            
+                            <div id="uploadPlaceholder" class="space-y-1">
+                                <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 group-hover:text-[#D4AF37] transition-colors"></i>
+                                <p class="text-xs text-slate-300 font-medium">Drop screenshot or click to browse</p>
+                                <p class="text-[11px] text-slate-500">AI will isolate this item into a luxury branding template</p>
+                            </div>
+                            
+                            <!-- Thumbnail Preview of Uploaded Source File -->
+                            <div id="sourcePreviewContainer" class="hidden w-full relative z-10 flex flex-col items-center gap-2">
+                                <img id="sourceImageThumbnail" class="max-h-32 rounded-lg object-contain border border-slate-800 shadow-md" alt="Source snapshot preview" />
+                                <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1"></i> Screenshot Loaded Successfully</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Product Title / Brand Name</label>
+                        <input type="text" id="prodTitle" placeholder="e.g., BLACK VIPER EDITION" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Luxury Price (₹)</label>
-                            <input type="number" id="prodPrice" placeholder="45,000" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
+                            <input type="number" id="prodPrice" placeholder="89,000" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Available Stock</label>
-                            <input type="number" id="prodQty" placeholder="12" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Stock Allocation</label>
+                            <input type="number" id="prodQty" placeholder="5" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Special AI Instruction</label>
-                        <textarea id="prodInstructions" rows="3" placeholder="e.g., Deep gold borders, premium dark luxury aesthetic, realistic reflections..." class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm resize-none"></textarea>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Poster Subtext / Slogan</label>
+                        <input type="text" id="prodSlogan" placeholder="e.g., Pure Power. Unmatched Elegance." class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" />
                     </div>
 
                     <!-- Step 1 Trigger Action -->
-                    <button type="button" id="btnGenerate" onclick="processAIGeneration()" class="w-full bg-gradient-to-r from-slate-900 to-slate-800 border border-amber-500/30 text-[#D4AF37] hover:text-white hover:border-[#D4AF37] font-bold py-3.5 rounded-xl transition-all duration-300 flex justify-center items-center gap-2 tracking-wider text-xs uppercase">
-                        <i class="fa-solid fa-compass-drafting"></i> 1. Auto Generate Preview
+                    <button type="button" id="btnGenerate" onclick="processAIPosterGeneration()" class="w-full bg-gradient-to-r from-slate-900 to-slate-800 border border-amber-500/30 text-[#D4AF37] hover:text-white hover:border-[#D4AF37] font-bold py-3.5 rounded-xl transition-all duration-300 flex justify-center items-center gap-2 tracking-wider text-xs uppercase">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 1. Run AI Branding Engine
                     </button>
                 </form>
             </section>
 
-            <!-- Right Side: Sandbox Engine, Verification & State Status Indicators -->
+            <!-- Right Side: Poster Sandbox & State Controls -->
             <section class="lg:col-span-7 flex flex-col gap-6">
                 
-                <!-- Live Pipeline Visual Indicator Bar -->
+                <!-- Live Status Flow Indicators -->
                 <div class="glassmorphism rounded-2xl p-4 flex justify-between items-center text-xs font-semibold tracking-wider px-6">
-                    <span class="text-slate-400">PIPELINE STATUS:</span>
+                    <span class="text-slate-400">POSTER PIPELINE:</span>
                     <div class="flex gap-4 items-center">
                         <span id="statePending" class="text-slate-600 transition-all duration-300"><i class="fa-solid fa-spinner fa-spin mr-1"></i> PENDING</span>
                         <span class="text-slate-700">|</span>
@@ -109,46 +129,36 @@
                     </div>
                 </div>
 
-                <!-- Live Preview Sandbox -->
-                <div class="glassmorphism rounded-3xl p-6 flex-1 flex flex-col justify-between min-h-[450px]">
+                <!-- Live Poster Output Sandbox -->
+                <div class="glassmorphism rounded-3xl p-6 flex-1 flex flex-col justify-between min-h-[500px]">
                     <div>
                         <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
-                            <h3 class="luxury-heading text-lg font-bold text-white"><i class="fa-solid fa-display mr-2 text-[#D4AF37]"></i>AI Sandbox Engine</h3>
-                            <button onclick="clearSystemConsole()" class="text-xs font-semibold text-rose-500 hover:text-rose-400 transition-all">Reset Console</button>
+                            <h3 class="luxury-heading text-lg font-bold text-white"><i class="fa-solid fa-crown mr-2 text-[#D4AF37]"></i>Generated Luxury Branding Poster</h3>
+                            <button onclick="clearConsole()" class="text-xs font-semibold text-rose-500 hover:text-rose-400 transition-all">Reset Sandbox</button>
                         </div>
 
-                        <!-- Waiting Placeholder View -->
-                        <div id="sandboxEmpty" class="h-64 border border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-500 space-y-3">
-                            <i class="fa-solid fa-cube text-4xl text-slate-700 animate-pulse"></i>
-                            <p class="text-sm">Engine Idle. Feed data and trigger preview generation.</p>
+                        <!-- Waiting State Box -->
+                        <div id="sandboxEmpty" class="h-80 border border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-500 space-y-3">
+                            <i class="fa-solid fa-photo-film text-4xl text-slate-700 animate-pulse"></i>
+                            <p class="text-sm">Upload screenshot and click generate to process the custom luxury brand poster layout.</p>
                         </div>
 
-                        <!-- Main AI Media Container Output (Hidden till Generation) -->
-                        <div id="sandboxData" class="hidden space-y-6">
-                            <div class="flex flex-col md:flex-row gap-6 items-center bg-black/40 border border-slate-800/60 p-4 rounded-2xl">
-                                <!-- Generated Image Viewframe -->
-                                <div class="w-48 h-48 rounded-xl overflow-hidden border border-amber-500/20 bg-slate-950 shrink-0 shadow-lg relative flex items-center justify-center">
-                                    <img id="outImage" src="" class="w-full h-full object-cover" alt="AI Generated Asset" />
-                                    <div class="absolute bottom-2 right-2 bg-black/80 border border-amber-500/30 rounded px-1.5 py-0.5 text-[8px] tracking-widest text-[#D4AF37] uppercase font-bold">ALGORITHMIC</div>
-                                </div>
-                                <div class="space-y-2 w-full">
-                                    <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">AI Asset Prepared</span>
-                                    <h4 id="outTitle" class="luxury-heading text-2xl font-bold text-white tracking-wide"></h4>
-                                    <p class="text-sm text-slate-400 font-medium">Price Metric: <span id="outPrice" class="text-[#D4AF37] font-bold"></span></p>
-                                    <p class="text-xs text-slate-500">Inventory Allocation: <span id="outQty" class="text-slate-300 font-semibold"></span> units available</p>
-                                </div>
+                        <!-- Main AI Generated Canvas Poster Framework Container -->
+                        <div id="sandboxData" class="hidden flex justify-center items-center py-4">
+                            <!-- High-Tech Canvas Container for Master Image -->
+                            <div class="w-full max-w-md aspect-square rounded-2xl overflow-hidden border border-amber-500/30 bg-black shadow-2xl relative">
+                                <img id="outPosterImage" src="" class="w-full h-full object-cover" alt="Final AI Branding Poster" />
                             </div>
                         </div>
                     </div>
 
-                    <!-- Hidden Action Row: Appears only after image generates -->
+                    <!-- Action Control Center Layout Drawer -->
                     <div id="actionContainer" class="hidden border-t border-slate-800 pt-6 mt-6">
-                        <p class="text-xs text-amber-500/80 mb-3 font-medium"><i class="fa-solid fa-circle-exclamation mr-1.5"></i> AI Image generated successfully. Choose action path below:</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <button onclick="triggerCancelState()" class="bg-red-950/40 hover:bg-red-900/30 border border-red-900/50 hover:border-red-500 text-red-400 text-xs font-bold py-3.5 rounded-xl transition-all uppercase tracking-wider">
-                                <i class="fa-solid fa-ban mr-1.5"></i> Abort / Cancel
+                                <i class="fa-solid fa-xmark mr-1.5"></i> Drop Asset
                             </button>
-                            <button id="btnUpload" onclick="uploadToLiveCatalog()" class="bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 text-xs font-black py-3.5 rounded-xl transition-all shadow-lg hover:brightness-110 uppercase tracking-wider">
+                            <button id="btnUpload" onclick="uploadPosterToLiveCatalog()" class="bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 text-xs font-black py-3.5 rounded-xl transition-all shadow-lg hover:brightness-110 uppercase tracking-wider">
                                 <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> 2. Upload to Live Store
                             </button>
                         </div>
@@ -159,131 +169,213 @@
         </div>
     </div>
 
-    <!-- System JavaScript Engine -->
+    <!-- Scripting Engine Logic -->
     <script>
         const STORAGE_KEY = 'shopyy_products';
-        let activeProductPayload = null;
+        let uploadedScreenshotBase64 = '';
+        let activePosterPayload = null;
 
-        // Reset display pipeline styles
+        // Screenshot Upload Processing Pipeline
+        document.getElementById('screenshotInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedScreenshotBase64 = e.target.result;
+                
+                // Toggle Thumbnail State Visibility Rules
+                document.getElementById('sourceImageThumbnail').src = uploadedScreenshotBase64;
+                document.getElementById('uploadPlaceholder').classList.add('hidden');
+                document.getElementById('sourcePreviewContainer').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+
         function resetStateIndicators() {
             document.getElementById('statePending').className = 'text-slate-600 transition-all duration-300';
             document.getElementById('stateCancelled').className = 'text-slate-600 transition-all duration-300';
             document.getElementById('stateSuccess').className = 'text-slate-600 transition-all duration-300';
         }
 
-        // STEP 1: Process Form Input & Generate High-Quality SVG Luxury Art Card Image
-        function processAIGeneration() {
+        // AI Poster Generation Routine Engine using HTML5 Canvas
+        function processAIPosterGeneration() {
             const title = document.getElementById('prodTitle').value.trim();
             const price = document.getElementById('prodPrice').value;
             const qty = document.getElementById('prodQty').value;
-            const instructions = document.getElementById('prodInstructions').value.trim();
+            const slogan = document.getElementById('prodSlogan').value.trim() || "DEFINING THE NEXT APEX.";
 
+            if (!uploadedScreenshotBase64) {
+                alert('Mandatory Error: Please upload a product screenshot image file first.');
+                return;
+            }
             if (!title || !price || !qty) {
-                alert('Please fulfill mandatory parameters: Title, Price, and Quantity.');
+                alert('Validation Error: Please configure Brand Title, Price and Stock values.');
                 return;
             }
 
             resetStateIndicators();
-            // Activate Neon Pending State Indicator
             document.getElementById('statePending').className = 'text-amber-400 font-bold drop-shadow-[0_0_8px_rgba(251,191,36,0.5)] transition-all duration-300 animate-pulse';
 
-            // Generate Canvas Premium Graphic Asset using dynamic inline-encoded vector matrix
-            const canvasSeed = Math.floor(Math.random() * 360);
-            const formattedPriceStr = Number(price).toLocaleString('en-IN');
+            // Create Canvas Image Compositor Engine
+            const canvas = document.createElement('canvas');
+            canvas.width = 1000;
+            canvas.height = 1000;
+            const ctx = canvas.getContext('2d');
+
+            // 1. Draw Premium Matte Black Background Base
+            const bgGrad = ctx.createLinearGradient(0, 0, 1000, 1000);
+            bgGrad.addColorStop(0, '#09090b');
+            bgGrad.addColorStop(0.5, '#141419');
+            bgGrad.addColorStop(1, '#020203');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, 1000, 1000);
+
+            // 2. Draw Luxury Geometric Metallic Alignment Grid Frames
+            ctx.strokeStyle = '#D4AF37';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.15;
+            ctx.strokeRect(40, 40, 920, 920);
+            ctx.strokeRect(60, 60, 880, 880);
             
-            const svgMarkup = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-                    <rect width="800" height="800" fill="#09090b"/>
-                    <circle cx="400" cy="400" r="360" fill="none" stroke="#D4AF37" stroke-width="2" stroke-opacity="0.15"/>
-                    <rect x="50" y="50" width="700" height="700" rx="40" fill="none" stroke="#D4AF37" stroke-width="1" stroke-opacity="0.2"/>
-                    <!-- Luxury Gradient Sphere Inside -->
-                    <defs>
-                        <radialGradient id="goldGleam" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#2c2514"/>
-                            <stop offset="100%" stop-color="#0c0a06"/>
-                        </radialGradient>
-                    </defs>
-                    <rect x="80" y="80" width="640" height="640" rx="30" fill="url(#goldGleam)" stroke="#D4AF37" stroke-width="2" stroke-opacity="0.4"/>
-                    <!-- Display Icon -->
-                    <text x="400" y="360" text-anchor="middle" font-size="140" fill="#D4AF37" filter="drop-shadow(0 10px 20px rgba(0,0,0,0.7))">👑</text>
-                    <!-- Titles -->
-                    <text x="400" y="490" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-size="34" font-weight="900" letter-spacing="6">${title.toUpperCase()}</text>
-                    <text x="400" y="550" text-anchor="middle" fill="#D4AF37" font-family="'Poppins', sans-serif" font-size="28" font-weight="600">₹${formattedPriceStr}</text>
-                    <text x="400" y="600" text-anchor="middle" fill="#64748b" font-family="'Poppins', sans-serif" font-size="14" font-weight="400" letter-spacing="2">EDITION CONFIRMED • STOCK: ${qty}</text>
-                </svg>
-            `;
+            // Abstract Circles for 3D Depth Visual feel
+            ctx.beginPath();
+            ctx.arc(500, 450, 320, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1.0;
 
-            const parsedBase64Image = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgMarkup)))}`;
+            // 3. Load, Process & Compound the Uploaded Screenshot Target Item
+            const imgInstance = new Image();
+            imgInstance.src = uploadedScreenshotBase64;
+            imgInstance.onload = function() {
+                // Draw a sleek luxury radial glow aura behind the screenshot element
+                const glowGrad = ctx.createRadialGradient(500, 450, 50, 500, 450, 350);
+                glowGrad.addColorStop(0, 'rgba(212, 175, 55, 0.15)');
+                glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = glowGrad;
+                ctx.fillRect(150, 100, 700, 700);
 
-            // Build item model object map
-            activeProductPayload = {
-                id: Date.now(),
-                title: title.toUpperCase(),
-                price: Number(price),
-                quantity: Number(qty),
-                description: instructions || `Exclusive high-tier collection item structured with premium design guidelines. Available for acquisition instantly. Limited allocation verified via active tracking matrix.`,
-                image: parsedBase64Image,
-                provider: "Luxury Studio AI"
+                // Add Premium Image Shadow effects to integrate screenshot seamlessly
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+                ctx.shadowBlur = 40;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 25;
+
+                // Draw screenshot item inside isolated aesthetic boundary frame box
+                // Aspect calculation to stretch nicely inside poster workspace
+                const targetWidth = 550;
+                const targetHeight = 400;
+                const targetX = 500 - (targetWidth / 2);
+                const targetY = 430 - (targetHeight / 2);
+                
+                ctx.drawImage(imgInstance, targetX, targetY, targetWidth, targetHeight);
+                
+                // Reset shadow values for rendering pristine typography layers
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetY = 0;
+
+                // 4. Inject Premium High-End Luxury Typography Elements
+                // Draw Header Brand stamp
+                ctx.fillStyle = '#D4AF37';
+                ctx.font = "900 18px 'Poppins', sans-serif";
+                ctx.textAlign = 'center';
+                ctx.letterSpacing = "8px";
+                ctx.fillText("LUXÈ INTERNATIONAL APEX", 500, 110);
+
+                // Draw Centralized Metallic Divider Lines
+                ctx.fillStyle = 'rgba(212, 175, 55, 0.3)';
+                ctx.fillRect(400, 130, 200, 1);
+
+                // Draw Main Title Name Heading Layer
+                ctx.fillStyle = '#ffffff';
+                ctx.font = "bold 52px 'Cinzel', serif";
+                ctx.letterSpacing = "4px";
+                ctx.fillText(title.toUpperCase(), 500, 740);
+
+                // Draw Slogan Subtext Layer
+                ctx.fillStyle = '#a1a1a6';
+                ctx.font = "300 18px 'Poppins', sans-serif";
+                ctx.letterSpacing = "3px";
+                ctx.fillText(slogan.toUpperCase(), 500, 785);
+
+                // Draw Pricing Badges
+                ctx.fillStyle = '#D4AF37';
+                ctx.font = "600 36px 'Poppins', sans-serif";
+                ctx.letterSpacing = "1px";
+                ctx.fillText(`₹${Number(price).toLocaleString('en-IN')}`, 500, 845);
+
+                // Base Status Signatures
+                ctx.fillStyle = '#4b5563';
+                ctx.font = "600 12px 'Poppins', sans-serif";
+                ctx.letterSpacing = "4px";
+                ctx.fillText(`LIMITED INTEGRATION MATRIX • ALLOCATION [${qty}]`, 500, 910);
+
+                // Extract flattened high-end compiled asset data string
+                const finalizedPosterDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+                // Packaging complete object payload maps to broadcast to index pipeline
+                activePosterPayload = {
+                    id: Date.now(),
+                    title: title.toUpperCase(),
+                    price: Number(price),
+                    quantity: Number(qty),
+                    description: `Custom automated poster asset composite. Built by targets derived from local file screenshot uploads matching matte industrial catalog parameters. Slogan text validation: "${slogan}".`,
+                    image: finalizedPosterDataUrl,
+                    provider: "AI Poster Engine"
+                };
+
+                // Output image source map configurations
+                document.getElementById('outPosterImage').src = finalizedPosterDataUrl;
+
+                // Render visibility settings toggles
+                document.getElementById('sandboxEmpty').classList.add('hidden');
+                document.getElementById('sandboxData').classList.remove('hidden');
+                document.getElementById('actionContainer').classList.remove('hidden');
             };
-
-            // Inject asset properties directly into preview DOM framework elements
-            document.getElementById('outImage').src = activeProductPayload.image;
-            document.getElementById('outTitle').innerText = activeProductPayload.title;
-            document.getElementById('outPrice').innerText = `₹${activeProductPayload.price.toLocaleString('en-IN')}`;
-            document.getElementById('outQty').innerText = activeProductPayload.quantity;
-
-            // Interface Mode Visibility Shifts
-            document.getElementById('sandboxEmpty').classList.add('hidden');
-            document.getElementById('sandboxData').classList.remove('hidden');
-            document.getElementById('actionContainer').classList.remove('hidden');
         }
 
-        // STEP 2 ACTION PATH A: Complete Final Storage Upload & Broadcast Success State
-        function uploadToLiveCatalog() {
-            if (!activeProductPayload) return;
+        // STEP 2: Save compiled Poster Matrix Array to live local storage structures
+        function uploadPosterToLiveCatalog() {
+            if (!activePosterPayload) return;
 
             const uploadBtn = document.getElementById('btnUpload');
-            uploadBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i> Synchronizing...`;
+            uploadBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i> Uploading to Catalog...`;
             uploadBtn.disabled = true;
 
             setTimeout(() => {
-                // Fetch dynamic array context from local device browser storage allocation
-                const activeDatabase = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                activeDatabase.push(activeProductPayload);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(activeDatabase));
+                const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                db.push(activePosterPayload);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
 
                 resetStateIndicators();
-                // Enable Vivid Green Success Flag State
                 document.getElementById('stateSuccess').className = 'text-emerald-400 font-bold drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] transition-all duration-300';
                 
-                alert('Success! Custom item synced to live store view portfolio successfully.');
+                alert('Success! Ultra premium branding poster uploaded and synced with live catalog successfully.');
                 
-                // Clear UI for next inputs
-                clearSystemConsole();
-                document.getElementById('productForm').reset();
+                clearConsole();
+                document.getElementById('posterForm').reset();
+                
+                // Clear upload files contexts
+                uploadedScreenshotBase64 = '';
+                document.getElementById('screenshotInput').value = '';
+                document.getElementById('uploadPlaceholder').classList.remove('hidden');
+                document.getElementById('sourcePreviewContainer').classList.add('hidden');
+
                 uploadBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> 2. Upload to Live Store`;
                 uploadBtn.disabled = false;
-            }, 800);
+            }, 1000);
         }
 
-        // STEP 2 ACTION PATH B: Cancel Action Pipeline Flow
         function triggerCancelState() {
             resetStateIndicators();
-            // Enable Vivid Red Cancel State Indicator
             document.getElementById('stateCancelled').className = 'text-rose-500 font-bold drop-shadow-[0_0_8px_rgba(244,63,94,0.5)] transition-all duration-300';
-            
-            alert('Action Aborted: Generation pipeline cancelled. Asset discarded.');
-            clearSystemConsole();
+            alert('Cancelled: Branding poster generation pipeline dropped.');
+            clearConsole();
         }
 
-        // Wipe UI Layout Nodes Clean
-        function clearSystemConsole() {
-            activeProductPayload = null;
-            document.getElementById('outImage').src = '';
-            document.getElementById('outTitle').innerText = '';
-            document.getElementById('outPrice').innerText = '';
-            document.getElementById('outQty').innerText = '';
-            
+        function clearConsole() {
+            activePosterPayload = null;
+            document.getElementById('outPosterImage').src = '';
             document.getElementById('sandboxData').classList.add('hidden');
             document.getElementById('actionContainer').classList.add('hidden');
             document.getElementById('sandboxEmpty').classList.remove('hidden');
