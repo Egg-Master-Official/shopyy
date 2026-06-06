@@ -1,313 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopyy AI Studio - Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-6">
-    <div class="max-w-6xl mx-auto">
-        
-        <!-- Header -->
-        <header class="border-b border-slate-800 pb-4 mb-8 flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
-            <div>
-                <h1 class="text-3xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">🦆 SHOPYY FULL AUTO-AI CATALOG</h1>
-                <p class="text-slate-400 text-sm mt-1">Free browser-based AI control: auto image, auto description, live localStorage sync.</p>
-            </div>
-            <a href="index.html" class="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-sm font-bold text-slate-300 hover:bg-slate-800 w-fit">
-                ⬅️ Back To Store
-            </a>
-        </header>
-
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
-            <!-- Left Side: Product Form -->
-            <section class="xl:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl h-fit">
-                <div class="flex items-start justify-between gap-4 mb-4">
-                    <div>
-                        <h2 class="text-lg font-bold text-white">⚙️ Full AI Product Control</h2>
-                        <p class="text-xs text-slate-500 mt-1">Upload an image or leave it blank to auto-generate one.</p>
-                    </div>
-                    <span class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-full">FREE LOCAL MODE</span>
-                </div>
-
-                <form id="aiSyncForm" class="space-y-4">
-                    <div>
-                        <label class="block text-xs uppercase font-bold text-slate-400 mb-1.5">AI Image Engine</label>
-                        <select id="providerInput" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500">
-                            <option value="Gemini-style AI">Gemini-style AI auto image</option>
-                            <option value="Canva-style AI">Canva-style AI auto design</option>
-                            <option value="Browser AI">Browser AI free generator</option>
-                        </select>
-                        <p class="text-[11px] text-slate-500 mt-1">This static app uses a free in-browser generator. Real Gemini/Canva APIs need official keys/accounts.</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs uppercase font-bold text-slate-400 mb-1.5">Product Photo (Optional)</label>
-                        <div class="border-2 border-dashed border-slate-700 hover:border-amber-500/50 rounded-xl p-4 text-center bg-slate-950 cursor-pointer relative transition-all min-h-[140px] flex flex-col justify-center items-center">
-                            <input type="file" id="screenshotInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                            <div id="uploadPlaceholder">
-                                <span class="text-2xl">📸</span>
-                                <p class="text-xs text-slate-400 mt-1">Click to select product image</p>
-                                <p class="text-[11px] text-slate-600 mt-1">No image? AI will auto-generate it.</p>
-                            </div>
-                            <img id="imagePreview" class="hidden max-h-36 mx-auto rounded object-contain z-10 relative" alt="Selected product preview" />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Product Name / Title</label>
-                        <input type="text" id="titleInput" placeholder="e.g., Premium Duck Roast Special" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500" required />
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Price (₹)</label>
-                            <input type="number" id="priceInput" min="0" step="0.01" placeholder="250" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500" required />
-                        </div>
-                        <div>
-                            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Quantity</label>
-                            <input type="number" id="qtyInput" min="0" step="1" placeholder="50" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500" required />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Product Description (Optional)</label>
-                        <textarea id="descriptionInput" rows="4" placeholder="Leave blank and AI will auto-generate a full selling description." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500 resize-none"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Extra AI Instructions (Optional)</label>
-                        <textarea id="notesInput" rows="3" placeholder="e.g., luxury style, organic spices, festival offer, kids friendly..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500 resize-none"></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button type="button" id="generatePreviewBtn" class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-black py-3 rounded-xl hover:bg-slate-700 transition-all">
-                            🎨 Auto Generate Preview
-                        </button>
-                        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black py-3 rounded-xl hover:opacity-90 transition-all shadow-lg">
-                            ⚡ Save & Live Sync
-                        </button>
-                    </div>
-                </form>
-            </section>
-
-            <!-- Right Side: AI Preview Sandbox -->
-            <section class="xl:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between min-h-[560px]">
-                <div>
-                    <div class="flex items-center justify-between gap-4 mb-4">
-                        <h2 class="text-lg font-bold text-white">✨ AI Engine Preview Sandbox</h2>
-                        <button id="clearCatalogBtn" class="text-xs font-bold text-rose-400 hover:text-rose-300">Clear Catalog</button>
-                    </div>
-
-                    <div id="sandboxEmpty" class="h-80 border-2 border-dashed border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-600">
-                        <span class="text-4xl">🤖</span>
-                        <p class="text-sm mt-2">Engine is waiting. Add details and press auto generate.</p>
-                    </div>
-
-                    <div id="sandboxOutput" class="hidden space-y-4">
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row gap-4 items-center">
-                            <div class="w-full md:w-56 h-56 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
-                                <img id="outputImage" src="" class="h-full w-full object-cover" alt="Generated product preview" />
-                            </div>
-                            <div class="w-full">
-                                <span id="outputProvider" class="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded">AUTO-GENERATED</span>
-                                <h3 id="outputTitle" class="text-2xl font-extrabold text-white mt-2">AI Premium Variant</h3>
-                                <div class="flex flex-wrap gap-4 text-sm mt-2">
-                                    <p class="text-amber-400 font-bold">Price: <span id="outputPrice"></span></p>
-                                    <p class="text-slate-400">Stock: <span id="outputQty"></span> items</p>
-                                </div>
-                                <p id="outputImageStatus" class="text-xs text-slate-500 mt-3"></p>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">AI Sales Description</h4>
-                            <p id="outputDesc" class="text-sm text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-lg border border-slate-800"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="successToast" class="hidden mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs font-semibold">
-                    🎉 Success! Product saved and automatically synchronized with the live store catalog.
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- Script / Logic -->
-    <script>
-        const STORAGE_KEY = 'shopyy_products';
-        const screenshotInput = document.getElementById('screenshotInput');
-        const imagePreview = document.getElementById('imagePreview');
-        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-        let selectedImageData = '';
-        let lastGeneratedProduct = null;
-
-        // Image Selection Handler
-        screenshotInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(readerEvent) {
-                selectedImageData = readerEvent.target.result;
-                imagePreview.src = selectedImageData;
-                imagePreview.classList.remove('hidden');
-                uploadPlaceholder.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-        });
-
-        function sanitizeText(value) {
-            return String(value || '').trim().replace(/\s+/g, ' ');
-        }
-
-        function getFormValues() {
-            return {
-                provider: document.getElementById('providerInput').value,
-                title: sanitizeText(document.getElementById('titleInput').value),
-                price: Number(document.getElementById('priceInput').value || 0),
-                quantity: Number(document.getElementById('qtyInput').value || 0),
-                manualDescription: sanitizeText(document.getElementById('descriptionInput').value),
-                notes: sanitizeText(document.getElementById('notesInput').value)
-            };
-        }
-
-        function buildAutoDescription({ title, price, quantity, notes, provider }) {
-            const offerLine = price > 0 ? `at just ₹${price.toLocaleString('en-IN')}` : 'with a special launch price';
-            const stockLine = quantity > 0 ? `${quantity.toLocaleString('en-IN')} pieces are ready for quick delivery` : 'limited stock is available now';
-            const notesLine = notes ? ` AI focus: ${notes}.` : ' AI focus: premium look, clear value, and fast buying confidence.';
-
-            return `${title} is a premium Shopyy product generated with ${provider}. It is presented ${offerLine}, crafted to look attractive in your live catalog, and optimized for customers who want quality without confusion. ${stockLine}. ${notesLine}`;
-        }
-
-        function hashText(text) {
-            return Array.from(text).reduce((hash, char) => ((hash << 5) - hash + char.charCodeAt(0)) | 0, 0);
-        }
-
-        // Cross-Browser safe Base64 SVG Generation
-        function generateSVGImage({ title, price, provider, notes }) {
-            const seed = Math.abs(hashText(`${title}-${provider}-${notes}`));
-            const hueA = seed % 360;
-            const hueB = (hueA + 38) % 360;
-            const hueC = (hueA + 190) % 360;
-            const shortTitle = title.length > 28 ? `${title.slice(0, 25)}...` : title;
-            const safeTitle = shortTitle.replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
-            const safeProvider = provider.replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
-
-            const svg = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900">
-                    <defs>
-                        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0%" stop-color="hsl(${hueA}, 84%, 42%)"/>
-                            <stop offset="55%" stop-color="hsl(${hueB}, 86%, 50%)"/>
-                            <stop offset="100%" stop-color="hsl(${hueC}, 70%, 28%)"/>
-                        </linearGradient>
-                        <filter id="shadow"><feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#020617" flood-opacity="0.45"/></filter>
-                    </defs>
-                    <rect width="900" height="900" fill="#020617"/>
-                    <rect x="36" y="36" width="828" height="828" rx="76" fill="url(#bg)"/>
-                    <circle cx="730" cy="160" r="118" fill="rgba(255,255,255,0.16)"/>
-                    <circle cx="180" cy="730" r="150" fill="rgba(255,255,255,0.12)"/>
-                    <g filter="url(#shadow)">
-                        <rect x="170" y="210" width="560" height="430" rx="54" fill="rgba(15,23,42,0.84)" stroke="rgba(255,255,255,0.24)" stroke-width="5"/>
-                        <circle cx="450" cy="365" r="112" fill="rgba(251,191,36,0.95)"/>
-                        <text x="450" y="402" text-anchor="middle" font-size="112" font-family="Arial, sans-serif">🛍️</text>
-                        <text x="450" y="525" text-anchor="middle" fill="#fff" font-size="48" font-weight="900" font-family="Arial, sans-serif">${safeTitle}</text>
-                        <text x="450" y="584" text-anchor="middle" fill="#fbbf24" font-size="42" font-weight="900" font-family="Arial, sans-serif">₹${Number(price || 0).toLocaleString('en-IN')}</text>
-                    </g>
-                    <rect x="230" y="690" width="440" height="72" rx="36" fill="rgba(2,6,23,0.72)"/>
-                    <text x="450" y="737" text-anchor="middle" fill="#fff" font-size="28" font-weight="800" font-family="Arial, sans-serif">${safeProvider}</text>
-                </svg>`;
-
-            return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-        }
-
-        function createProduct() {
-            const values = getFormValues();
-            if (!values.title) {
-                alert('Please enter a product title first.');
-                return null;
-            }
-
-            const description = values.manualDescription || buildAutoDescription(values);
-            const image = selectedImageData || generateSVGImage(values);
-
-            return {
-                id: Date.now(),
-                title: values.title.toUpperCase(),
-                price: values.price,
-                quantity: values.quantity,
-                description,
-                image,
-                provider: values.provider,
-                imageStatus: selectedImageData ? 'Uploaded product photo used.' : 'No photo uploaded, so a free AI-style image was generated automatically.'
-            };
-        }
-
-        function showPreview(product) {
-            document.getElementById('outputImage').src = product.image;
-            document.getElementById('outputTitle').innerText = product.title;
-            document.getElementById('outputPrice').innerText = `₹${product.price.toLocaleString('en-IN')}`;
-            document.getElementById('outputQty').innerText = product.quantity.toLocaleString('en-IN');
-            document.getElementById('outputDesc').innerText = product.description;
-            document.getElementById('outputProvider').innerText = product.provider;
-            document.getElementById('outputImageStatus').innerText = product.imageStatus;
-            document.getElementById('sandboxEmpty').classList.add('hidden');
-            document.getElementById('sandboxOutput').classList.remove('hidden');
-        }
-
-        function saveProduct(product) {
-            const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            db.push(product);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-        }
-
-        // Preview Trigger
-        document.getElementById('generatePreviewBtn').addEventListener('click', () => {
-            lastGeneratedProduct = createProduct();
-            if (lastGeneratedProduct) showPreview(lastGeneratedProduct);
-        });
-
-        // Submit and Sync Trigger
-        document.getElementById('aiSyncForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.innerText = '🤖 Generating & syncing...';
-            btn.disabled = true;
-
-            setTimeout(() => {
-                lastGeneratedProduct = createProduct();
-                if (lastGeneratedProduct) {
-                    showPreview(lastGeneratedProduct);
-                    saveProduct(lastGeneratedProduct);
-                    document.getElementById('successToast').classList.remove('hidden');
-                    
-                    // Reset Form State Properly
-                    this.reset();
-                    selectedImageData = '';
-                    imagePreview.src = '';
-                    imagePreview.classList.add('hidden');
-                    uploadPlaceholder.classList.remove('hidden');
-                }
-
-                btn.innerText = '⚡ Save & Live Sync';
-                btn.disabled = false;
-            }, 500);
-        });
-
-        // Clear Catalog Functionality
-        document.getElementById('clearCatalogBtn').addEventListener('click', () => {
-            if (!confirm('Clear all saved Shopyy products from this browser?')) return;
-            localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem('batak_products');
-            localStorage.removeItem('shopyy_productss');
-            document.getElementById('successToast').classList.add('hidden');
-            document.getElementById('sandboxEmpty').classList.remove('hidden');
-            document.getElementById('sandboxOutput').classList.add('hidden');
-            alert('Catalog cleared from this browser.');
-        });
-    </script>
-</body>
-</html>
+diff --git a/index.html b/index.html
+index 58ecec9c82e760e06f2ce6d0fe9aaed93f4e4501..b3b73237961de56d6bfd203e68355840316a6486 100644
+--- a/index.html
++++ b/index.html
+@@ -1,86 +1,134 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title>Batak Store - Premium Catalog</title>
++    <title>Shopyy AI Store - Auto Catalog</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+ </head>
+ <body class="bg-slate-950 text-slate-100 min-h-screen">
+ 
+-    <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
+-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+-            <h1 class="text-2xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent tracking-wider">🦆 BATAK AI</h1>
+-            <div class="flex items-center gap-6">
++    <nav class="border-b border-slate-800 bg-slate-900/70 backdrop-blur sticky top-0 z-50">
++        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
++            <div>
++                <h1 class="text-2xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent tracking-wider">🦆 SHOPYY AUTO-AI</h1>
++                <p class="text-xs text-slate-500">Free browser catalog with auto image + description generation</p>
++            </div>
++            <div class="flex items-center gap-4">
+                 <a href="admin.html" class="text-sm font-semibold text-amber-400 hover:underline">⚡ AI Admin Panel</a>
+                 <div class="relative bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
+                     🛒 Cart (<span id="cartCount" class="font-bold text-amber-400">0</span>)
+                 </div>
+             </div>
+         </div>
+     </nav>
+ 
+     <main class="max-w-6xl mx-auto px-4 py-12">
+         <div class="text-center mb-12">
+-            <h2 class="text-4xl font-extrabold mb-2">Batak AI Live Catalog</h2>
+-            <p class="text-slate-400 text-sm">Products uploaded from your secret AI dashboard will instantly show up here.</p>
++            <p class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-2 mb-4">Gemini / Canva style local AI mode</p>
++            <h2 class="text-4xl font-extrabold mb-2">Live Auto-Generated Catalog</h2>
++            <p class="text-slate-400 text-sm max-w-2xl mx-auto">Products created from the admin panel sync here instantly. If no image is uploaded, the panel generates a free browser-made product visual automatically.</p>
+         </div>
+ 
+-        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+-            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden p-4 shadow-xl">
+-                <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800/50">
+-                    <span class="text-slate-600 text-5xl">🥚</span>
+-                </div>
+-                <div class="mt-4">
+-                    <div class="flex justify-between items-start mb-2">
+-                        <h3 class="text-lg font-bold text-white">Default Sample Variant</h3>
+-                        <span class="text-amber-400 font-black text-xl">₹99</span>
+-                    </div>
+-                    <p class="text-sm text-slate-400 line-clamp-2 mb-4">Go to AI Admin Panel to upload your customized screenshots and live sync real items.</p>
+-                    <button onclick="addToCart(99)" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition-all border border-slate-700">
+-                        Add To Cart
+-                    </button>
++        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
++    </main>
++
++    <template id="emptyCatalogTemplate">
++        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden p-4 shadow-xl">
++            <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800/50">
++                <span class="text-slate-600 text-5xl">🥚</span>
++            </div>
++            <div class="mt-4">
++                <div class="flex justify-between items-start mb-2 gap-4">
++                    <h3 class="text-lg font-bold text-white">Sample AI Product</h3>
++                    <span class="text-amber-400 font-black text-xl">₹99</span>
+                 </div>
++                <p class="text-sm text-slate-400 line-clamp-3 mb-4">Go to AI Admin Panel to generate an image, auto-write a description, and sync real products to this store.</p>
++                <button onclick="addToCart(99)" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition-all border border-slate-700">
++                    Add To Cart
++                </button>
+             </div>
+         </div>
+-    </main>
++    </template>
+ 
+     <script>
++        const STORAGE_KEY = 'shopyy_products';
++        const LEGACY_KEYS = ['batak_products', 'shopyy_productss'];
+         let cartCount = 0;
++
+         function addToCart(price) {
+             cartCount++;
+             document.getElementById('cartCount').innerText = cartCount;
+-            alert(`Item added to cart! Price: ₹${price}`);
++            alert(`Item added to cart! Price: ₹${Number(price || 0).toLocaleString('en-IN')}`);
++        }
++
++        function escapeHTML(value) {
++            return String(value || '').replace(/[&<>'"]/g, char => ({
++                '&': '&amp;',
++                '<': '&lt;',
++                '>': '&gt;',
++                "'": '&#39;',
++                '"': '&quot;'
++            }[char]));
++        }
++
++        function getProducts() {
++            const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
++            const migrated = LEGACY_KEYS.flatMap(key => JSON.parse(localStorage.getItem(key) || '[]'));
++            const allProducts = [...current, ...migrated];
++
++            if (migrated.length) {
++                localStorage.setItem(STORAGE_KEY, JSON.stringify(allProducts));
++                LEGACY_KEYS.forEach(key => localStorage.removeItem(key));
++            }
++
++            return allProducts;
++        }
++
++        function renderProduct(product) {
++            const safeTitle = escapeHTML(product.title || 'Untitled Product');
++            const safeDescription = escapeHTML(product.description || 'Auto-generated product listing.');
++            const safeImage = escapeHTML(product.image || '');
++            const safeProvider = escapeHTML(product.provider || 'Browser AI');
++            const price = Number(product.price || 0);
++            const quantity = Number(product.quantity || 0);
++
++            const card = document.createElement('div');
++            card.className = 'bg-slate-900 border border-amber-500/20 shadow-lg shadow-amber-500/5 rounded-2xl overflow-hidden p-4 relative';
++            card.innerHTML = `
++                <div class="absolute top-3 right-3 bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full">${safeProvider}</div>
++                <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800">
++                    <img src="${safeImage}" class="h-full w-full object-cover" alt="${safeTitle}" />
++                </div>
++                <div class="mt-4">
++                    <div class="flex justify-between items-start mb-2 gap-4">
++                        <h3 class="text-lg font-bold text-white leading-tight">${safeTitle}</h3>
++                        <span class="text-amber-400 font-black text-xl whitespace-nowrap">₹${price.toLocaleString('en-IN')}</span>
++                    </div>
++                    <p class="text-xs text-slate-500 mb-2">Stock: ${quantity.toLocaleString('en-IN')} items</p>
++                    <p class="text-sm text-slate-400 line-clamp-3 mb-4">${safeDescription}</p>
++                    <button onclick="addToCart(${price})" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold py-2.5 rounded-xl transition-all shadow-md">
++                        Add To Cart
++                    </button>
++                </div>
++            `;
++            return card;
+         }
+ 
+         function loadAIProducts() {
+-            const products = JSON.parse(localStorage.getItem('batak_products')) || [];
++            const products = getProducts();
+             const grid = document.getElementById('productGrid');
++            grid.innerHTML = '';
+ 
+-            products.forEach(product => {
+-                const card = document.createElement('div');
+-                card.className = "bg-slate-900 border border-amber-500/20 shadow-lg shadow-amber-500/5 rounded-2xl overflow-hidden p-4 relative";
+-                card.innerHTML = `
+-                    <div class="absolute top-3 right-3 bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full">AI AUTOMATED</div>
+-                    <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800">
+-                        <img src="${product.image}" class="max-h-full max-w-full object-contain" alt="Product Image" />
+-                    </div>
+-                    <div class="mt-4">
+-                        <div class="flex justify-between items-start mb-2">
+-                            <h3 class="text-lg font-bold text-white">${product.title}</h3>
+-                            <span class="text-amber-400 font-black text-xl">₹${product.price}</span>
+-                        </div>
+-                        <p class="text-sm text-slate-400 line-clamp-3 mb-4">${product.description}</p>
+-                        <button onclick="addToCart(${product.price})" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold py-2.5 rounded-xl transition-all shadow-md">
+-                            Add To Cart
+-                        </button>
+-                    </div>
+-                `;
+-                grid.appendChild(card);
+-            });
++            if (!products.length) {
++                grid.appendChild(document.getElementById('emptyCatalogTemplate').content.cloneNode(true));
++                return;
++            }
++
++            products.slice().reverse().forEach(product => grid.appendChild(renderProduct(product)));
+         }
+ 
+         window.onload = loadAIProducts;
+     </script>
+ </body>
+ </html>
