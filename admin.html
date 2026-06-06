@@ -39,7 +39,7 @@
                             <option value="Canva-style AI">Canva-style AI auto design</option>
                             <option value="Browser AI">Browser AI free generator</option>
                         </select>
-                        <p class="text-[11px] text-slate-500 mt-1">This static app uses a free in-browser generator. Real Gemini/Canva APIs need official keys/accounts.</p>
+                    </p>
                     </div>
 
                     <div>
@@ -246,28 +246,20 @@
             };
         }
 
-        function showPreview(product) {
-            document.getElementById('outputImage').src = product.image;
-            document.getElementById('outputTitle').innerText = product.title;
-            document.getElementById('outputPrice').innerText = `₹${product.price.toLocaleString('en-IN')}`;
-            document.getElementById('outputQty').innerText = product.quantity.toLocaleString('en-IN');
-            document.getElementById('outputDesc').innerText = product.description;
-            document.getElementById('outputProvider').innerText = product.provider;
-            document.getElementById('outputImageStatus').innerText = product.imageStatus;
-            document.getElementById('sandboxEmpty').classList.add('hidden');
-            document.getElementById('sandboxOutput').classList.remove('hidden');
-        }
-
-        function saveProduct(product) {
-            const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            db.push(product);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-        }
-
         // Preview Trigger
         document.getElementById('generatePreviewBtn').addEventListener('click', () => {
             lastGeneratedProduct = createProduct();
-            if (lastGeneratedProduct) showPreview(lastGeneratedProduct);
+            if (lastGeneratedProduct) {
+                document.getElementById('outputImage').src = lastGeneratedProduct.image;
+                document.getElementById('outputTitle').innerText = lastGeneratedProduct.title;
+                document.getElementById('outputPrice').innerText = `₹${lastGeneratedProduct.price.toLocaleString('en-IN')}`;
+                document.getElementById('outputQty').innerText = lastGeneratedProduct.quantity.toLocaleString('en-IN');
+                document.getElementById('outputDesc').innerText = lastGeneratedProduct.description;
+                document.getElementById('outputProvider').innerText = lastGeneratedProduct.provider;
+                document.getElementById('outputImageStatus').innerText = lastGeneratedProduct.imageStatus;
+                document.getElementById('sandboxEmpty').classList.add('hidden');
+                document.getElementById('sandboxOutput').classList.remove('hidden');
+            }
         });
 
         // Submit and Sync Trigger
@@ -280,18 +272,17 @@
             setTimeout(() => {
                 lastGeneratedProduct = createProduct();
                 if (lastGeneratedProduct) {
-                    showPreview(lastGeneratedProduct);
-                    saveProduct(lastGeneratedProduct);
-                    document.getElementById('successToast').classList.remove('hidden');
+                    const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                    db.push(lastGeneratedProduct);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
                     
-                    // Reset Form State Properly
+                    document.getElementById('successToast').classList.remove('hidden');
                     this.reset();
                     selectedImageData = '';
                     imagePreview.src = '';
                     imagePreview.classList.add('hidden');
                     uploadPlaceholder.classList.remove('hidden');
                 }
-
                 btn.innerText = '⚡ Save & Live Sync';
                 btn.disabled = false;
             }, 500);
@@ -301,8 +292,6 @@
         document.getElementById('clearCatalogBtn').addEventListener('click', () => {
             if (!confirm('Clear all saved Shopyy products from this browser?')) return;
             localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem('batak_products');
-            localStorage.removeItem('shopyy_productss');
             document.getElementById('successToast').classList.add('hidden');
             document.getElementById('sandboxEmpty').classList.remove('hidden');
             document.getElementById('sandboxOutput').classList.add('hidden');
