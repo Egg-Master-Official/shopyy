@@ -8,7 +8,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen p-6">
     <div class="max-w-6xl mx-auto">
-        
         <header class="border-b border-slate-800 pb-4 mb-8 flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
             <div>
                 <h1 class="text-3xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">🦆 SHOPYY FULL AUTO-AI CATALOG</h1>
@@ -29,7 +28,7 @@
                     <span class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-full">FREE LOCAL MODE</span>
                 </div>
 
-                <form id="aiSyncForm" class="space-y-4" onsubmit="return false;">
+                <form id="aiSyncForm" class="space-y-4">
                     <div>
                         <label class="block text-xs uppercase font-bold text-slate-400 mb-1.5">AI Image Engine</label>
                         <select id="providerInput" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500">
@@ -37,7 +36,7 @@
                             <option value="Canva-style AI">Canva-style AI auto design</option>
                             <option value="Browser AI">Browser AI free generator</option>
                         </select>
-                        <p class="text-[11px] text-slate-500 mt-1">This static app uses a free in-browser generator. Real Gemini/Canva APIs need official keys.</p>
+                        <p class="text-[11px] text-slate-500 mt-1">This static app uses a free in-browser generator. Real Gemini/Canva APIs need official keys/accounts.</p>
                     </div>
 
                     <div>
@@ -76,14 +75,14 @@
 
                     <div>
                         <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Extra AI Instructions (Optional)</label>
-                        <textarea id="notesInput" rows="3" placeholder="e.g., luxury style, organic spices, festival offer..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500 resize-none"></textarea>
+                        <textarea id="notesInput" rows="3" placeholder="e.g., luxury style, organic spices, festival offer, kids friendly..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500 resize-none"></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <button type="button" id="generatePreviewBtn" class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-black py-3 rounded-xl hover:bg-slate-700 transition-all">
                             🎨 Auto Generate Preview
                         </button>
-                        <button type="button" id="submitBtn" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black py-3 rounded-xl hover:opacity-90 transition-all shadow-lg">
+                        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black py-3 rounded-xl hover:opacity-90 transition-all shadow-lg">
                             ⚡ Save & Live Sync
                         </button>
                     </div>
@@ -138,6 +137,7 @@
         const imagePreview = document.getElementById('imagePreview');
         const uploadPlaceholder = document.getElementById('uploadPlaceholder');
         let selectedImageData = '';
+        let lastGeneratedProduct = null;
 
         screenshotInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -173,7 +173,7 @@
             const stockLine = quantity > 0 ? `${quantity.toLocaleString('en-IN')} pieces are ready for quick delivery` : 'limited stock is available now';
             const notesLine = notes ? ` AI focus: ${notes}.` : ' AI focus: premium look, clear value, and fast buying confidence.';
 
-            return `${title} is a premium Shopyy product generated with ${provider}. It is presented ${offerLine}, crafted to look attractive in your live catalog, and optimized for customers who want quality without confusion. ${stockLine}.${notesLine}`;
+            return `${title} is a premium Shopyy product generated with ${provider}. It is presented ${offerLine}, crafted to look attractive in your live catalog, and optimized for customers who want quality without confusion. ${stockLine}. ${notesLine}`;
         }
 
         function hashText(text) {
@@ -257,37 +257,24 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
         }
 
-        // Fix 1: Auto Preview generation logic
         document.getElementById('generatePreviewBtn').addEventListener('click', () => {
-            const product = createProduct();
-            if (product) {
-                showPreview(product);
-                document.getElementById('successToast').classList.add('hidden'); // Clear previous flash
-            }
+            lastGeneratedProduct = createProduct();
+            if (lastGeneratedProduct) showPreview(lastGeneratedProduct);
         });
 
-        // Fix 2: Click handling optimization to prevent immediate structural reset
-        document.getElementById('submitBtn').addEventListener('click', function() {
-            const form = document.getElementById('aiSyncForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
+        document.getElementById('aiSyncForm').addEventListener('submit', function(event) {
+            event.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.innerText = '🤖 Generating & syncing...';
             btn.disabled = true;
 
             setTimeout(() => {
-                const product = createProduct();
-                if (product) {
-                    showPreview(product);
-                    saveProduct(product);
-                    
+                lastGeneratedProduct = createProduct();
+                if (lastGeneratedProduct) {
+                    showPreview(lastGeneratedProduct);
+                    saveProduct(lastGeneratedProduct);
                     document.getElementById('successToast').classList.remove('hidden');
-                    
-                    // Form fields state reset
-                    form.reset();
+                    this.reset();
                     selectedImageData = '';
                     imagePreview.src = '';
                     imagePreview.classList.add('hidden');
@@ -296,10 +283,9 @@
 
                 btn.innerText = '⚡ Save & Live Sync';
                 btn.disabled = false;
-            }, 600);
+            }, 500);
         });
 
-        // Clear catalog logic across keys
         document.getElementById('clearCatalogBtn').addEventListener('click', () => {
             if (!confirm('Clear all saved Shopyy products from this browser?')) return;
             localStorage.removeItem(STORAGE_KEY);
