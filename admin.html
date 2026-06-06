@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxury Control Studio - AI Screenshot Poster Engine</title>
+    <title>Luxury Control Studio - Background Isolation Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,13 +40,13 @@
 <body class="text-slate-200 min-h-screen p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
+        <!-- Top Navigation Header -->
         <header class="glassmorphism rounded-2xl p-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-wand-magic-sparkles text-2xl text-[var(--luxury-gold)]"></i>
                 <div>
-                    <h1 class="luxury-heading text-xl md:text-2xl font-black tracking-widest text-white">LUXÈ <span class="text-[#D4AF37]">POSTER BRANDING ENGINE</span></h1>
-                    <p class="text-xs text-slate-400">Upload item screenshot to auto-generate luxury themed branding marketing posters</p>
+                    <h1 class="luxury-heading text-xl md:text-2xl font-black tracking-widest text-white">LUXÈ <span class="text-[#D4AF37]">PRESERVE & GLASS TRANSFORM</span></h1>
+                    <p class="text-xs text-slate-400">Keeps original product design intact while rebuilding custom premium web backgrounds</p>
                 </div>
             </div>
             <a href="index.html" class="glassmorphism px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-[#D4AF37] transition-all flex items-center gap-2">
@@ -54,112 +54,105 @@
             </a>
         </header>
 
-        <!-- Main Workspace -->
+        <!-- Configuration Grid Panel -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- Left Side: Screenshot Upload & Target Settings -->
+            <!-- Left Inputs Panel -->
             <section class="lg:col-span-5 glassmorphism rounded-3xl p-6 h-fit space-y-5">
                 <h2 class="luxury-heading text-lg font-bold text-white border-b border-slate-800 pb-3 flex justify-between items-center">
-                    <span><i class="fa-solid fa-camera mr-2 text-[#D4AF37]"></i>Source Screenshot</span>
-                    <span class="text-[10px] bg-amber-500/10 text-[#D4AF37] border border-amber-500/20 px-2 py-0.5 rounded-full">AI TARGET LOCK</span>
+                    <span><i class="fa-solid fa-image-portrait mr-2 text-[#D4AF37]"></i>Product Lock</span>
+                    <span class="text-[10px] bg-amber-500/10 text-[#D4AF37] border border-amber-500/20 px-2 py-0.5 rounded-full">DESIGN PRESERVATION</span>
                 </h2>
 
                 <form id="posterForm" class="space-y-4" onsubmit="event.preventDefault();">
                     
-                    <!-- CRITICAL: SCREENSHOT DROPZONE OPTION -->
+                    <!-- UPLOAD SECTION -->
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Upload Product Screenshot</label>
-                        <div class="border-2 border-dashed border-slate-700 hover:border-[#D4AF37]/50 rounded-xl p-4 text-center bg-slate-950/60 cursor-pointer relative transition-all min-h-[150px] flex flex-col justify-center items-center group">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Upload Screenshot</label>
+                        <div class="border-2 border-dashed border-slate-700 hover:border-[#D4AF37]/50 rounded-xl p-4 text-center bg-slate-950/60 cursor-pointer relative transition-all min-h-[160px] flex flex-col justify-center items-center group">
                             <input type="file" id="screenshotInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required />
                             
                             <div id="uploadPlaceholder" class="space-y-1">
-                                <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 group-hover:text-[#D4AF37] transition-colors"></i>
-                                <p class="text-xs text-slate-300 font-medium">Drop screenshot or click to browse</p>
-                                <p class="text-[11px] text-slate-500">AI will isolate this item into a luxury branding template</p>
+                                <i class="fa-solid fa-crop-simple text-3xl text-slate-500 group-hover:text-[#D4AF37] transition-colors"></i>
+                                <p class="text-xs text-slate-300 font-medium">Select product screenshot</p>
+                                <p class="text-[11px] text-slate-500">Engine preserves item artwork, changes background to glass theme</p>
                             </div>
                             
-                            <!-- Thumbnail Preview of Uploaded Source File -->
                             <div id="sourcePreviewContainer" class="hidden w-full relative z-10 flex flex-col items-center gap-2">
-                                <img id="sourceImageThumbnail" class="max-h-32 rounded-lg object-contain border border-slate-800 shadow-md" alt="Source snapshot preview" />
-                                <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1"></i> Screenshot Loaded Successfully</span>
+                                <img id="sourceImageThumbnail" class="max-h-32 rounded-lg object-contain border border-slate-800 shadow-md" alt="Source item snapshot" />
+                                <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30"><i class="fa-solid fa-shield-halved mr-1"></i> Original Design Secured</span>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Product Title / Brand Name</label>
-                        <input type="text" id="prodTitle" placeholder="e.g., BLACK VIPER EDITION" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Product Title</label>
+                        <input type="text" id="prodTitle" placeholder="e.g., ONYX BLACK EDITION" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Luxury Price (₹)</label>
-                            <input type="number" id="prodPrice" placeholder="89,000" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Price (₹)</label>
+                            <input type="number" id="prodPrice" placeholder="95,000" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Stock Allocation</label>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Stock</label>
                             <input type="number" id="prodQty" placeholder="5" class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" required />
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Poster Subtext / Slogan</label>
-                        <input type="text" id="prodSlogan" placeholder="e.g., Pure Power. Unmatched Elegance." class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" />
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Luxury Slogan Subtext</label>
+                        <input type="text" id="prodSlogan" placeholder="e.g., Unaltered Core. Reimagined Environment." class="w-full premium-input rounded-xl px-4 py-3 text-white text-sm" />
                     </div>
 
-                    <!-- Step 1 Trigger Action -->
-                    <button type="button" id="btnGenerate" onclick="processAIPosterGeneration()" class="w-full bg-gradient-to-r from-slate-900 to-slate-800 border border-amber-500/30 text-[#D4AF37] hover:text-white hover:border-[#D4AF37] font-bold py-3.5 rounded-xl transition-all duration-300 flex justify-center items-center gap-2 tracking-wider text-xs uppercase">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> 1. Run AI Branding Engine
+                    <button type="button" onclick="generatePreservedBrandingPoster()" class="w-full bg-gradient-to-r from-slate-900 to-slate-800 border border-amber-500/40 text-[#D4AF37] hover:text-white hover:border-[#D4AF37] font-bold py-3.5 rounded-xl transition-all duration-300 flex justify-center items-center gap-2 tracking-wider text-xs uppercase">
+                        <i class="fa-solid fa-compress"></i> 1. Isolate BG & Inject Glass Depth
                     </button>
                 </form>
             </section>
 
-            <!-- Right Side: Poster Sandbox & State Controls -->
+            <!-- Right Output Window Sandbox -->
             <section class="lg:col-span-7 flex flex-col gap-6">
                 
-                <!-- Live Status Flow Indicators -->
+                <!-- HUD Process States -->
                 <div class="glassmorphism rounded-2xl p-4 flex justify-between items-center text-xs font-semibold tracking-wider px-6">
-                    <span class="text-slate-400">POSTER PIPELINE:</span>
+                    <span class="text-slate-400">ENGINE STATUS:</span>
                     <div class="flex gap-4 items-center">
-                        <span id="statePending" class="text-slate-600 transition-all duration-300"><i class="fa-solid fa-spinner fa-spin mr-1"></i> PENDING</span>
+                        <span id="statePending" class="text-slate-600 transition-all duration-300"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i> STANDBY</span>
                         <span class="text-slate-700">|</span>
-                        <span id="stateCancelled" class="text-slate-600 transition-all duration-300"><i class="fa-solid fa-ban mr-1"></i> CANCELLED</span>
-                        <span class="text-slate-700">|</span>
-                        <span id="stateSuccess" class="text-slate-600 transition-all duration-300"><i class="fa-solid fa-circle-check mr-1"></i> UPLOAD SUCCESS</span>
+                        <span id="stateSuccess" class="text-slate-600 transition-all duration-300"><i class="fa-solid fa-circle-check mr-1"></i> PIPELINE SYNCED</span>
                     </div>
                 </div>
 
-                <!-- Live Poster Output Sandbox -->
-                <div class="glassmorphism rounded-3xl p-6 flex-1 flex flex-col justify-between min-h-[500px]">
+                <!-- Main Poster Render Area -->
+                <div class="glassmorphism rounded-3xl p-6 flex-1 flex flex-col justify-between min-h-[520px]">
                     <div>
                         <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
-                            <h3 class="luxury-heading text-lg font-bold text-white"><i class="fa-solid fa-crown mr-2 text-[#D4AF37]"></i>Generated Luxury Branding Poster</h3>
-                            <button onclick="clearConsole()" class="text-xs font-semibold text-rose-500 hover:text-rose-400 transition-all">Reset Sandbox</button>
+                            <h3 class="luxury-heading text-lg font-bold text-white"><i class="fa-solid fa-wand-magic mr-2 text-[#D4AF37]"></i>Website Theme Matching Canvas</h3>
+                            <button onclick="resetSandboxTerminal()" class="text-xs font-semibold text-rose-500 hover:text-rose-400 transition-all">Clear Canvas</button>
                         </div>
 
-                        <!-- Waiting State Box -->
                         <div id="sandboxEmpty" class="h-80 border border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-500 space-y-3">
-                            <i class="fa-solid fa-photo-film text-4xl text-slate-700 animate-pulse"></i>
-                            <p class="text-sm">Upload screenshot and click generate to process the custom luxury brand poster layout.</p>
+                            <i class="fa-solid fa-shield-cat text-4xl text-slate-700 animate-pulse"></i>
+                            <p class="text-sm">Upload snapshot to extract product onto luxury glass matrix background.</p>
                         </div>
 
-                        <!-- Main AI Generated Canvas Poster Framework Container -->
-                        <div id="sandboxData" class="hidden flex justify-center items-center py-4">
-                            <!-- High-Tech Canvas Container for Master Image -->
+                        <div id="sandboxData" class="hidden flex justify-center items-center py-2">
                             <div class="w-full max-w-md aspect-square rounded-2xl overflow-hidden border border-amber-500/30 bg-black shadow-2xl relative">
-                                <img id="outPosterImage" src="" class="w-full h-full object-cover" alt="Final AI Branding Poster" />
+                                <img id="outPosterImage" src="" class="w-full h-full object-cover" alt="Unaltered Product in Glass Theme" />
                             </div>
                         </div>
                     </div>
 
-                    <!-- Action Control Center Layout Drawer -->
-                    <div id="actionContainer" class="hidden border-t border-slate-800 pt-6 mt-6">
+                    <!-- Confirm CTA Drawer Buttons -->
+                    <div id="actionContainer" class="hidden border-t border-slate-800 pt-6 mt-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <button onclick="triggerCancelState()" class="bg-red-950/40 hover:bg-red-900/30 border border-red-900/50 hover:border-red-500 text-red-400 text-xs font-bold py-3.5 rounded-xl transition-all uppercase tracking-wider">
-                                <i class="fa-solid fa-xmark mr-1.5"></i> Drop Asset
+                            <button onclick="resetSandboxTerminal()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold py-3.5 rounded-xl transition-all uppercase tracking-wider">
+                                <i class="fa-solid fa-trash mr-1.5"></i> Clear Item
                             </button>
-                            <button id="btnUpload" onclick="uploadPosterToLiveCatalog()" class="bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 text-xs font-black py-3.5 rounded-xl transition-all shadow-lg hover:brightness-110 uppercase tracking-wider">
-                                <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> 2. Upload to Live Store
+                            <button id="btnUpload" onclick="commitAssetToLiveCatalog()" class="bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 text-xs font-black py-3.5 rounded-xl transition-all shadow-lg hover:brightness-110 uppercase tracking-wider">
+                                <i class="fa-solid fa-circle-check mr-1.5"></i> 2. Push to Website Catalog
                             </button>
                         </div>
                     </div>
@@ -169,22 +162,18 @@
         </div>
     </div>
 
-    <!-- Scripting Engine Logic -->
+    <!-- Processing Logic Execution Engine -->
     <script>
         const STORAGE_KEY = 'shopyy_products';
         let uploadedScreenshotBase64 = '';
         let activePosterPayload = null;
 
-        // Screenshot Upload Processing Pipeline
         document.getElementById('screenshotInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 uploadedScreenshotBase64 = e.target.result;
-                
-                // Toggle Thumbnail State Visibility Rules
                 document.getElementById('sourceImageThumbnail').src = uploadedScreenshotBase64;
                 document.getElementById('uploadPlaceholder').classList.add('hidden');
                 document.getElementById('sourcePreviewContainer').classList.remove('hidden');
@@ -192,193 +181,180 @@
             reader.readAsDataURL(file);
         });
 
-        function resetStateIndicators() {
-            document.getElementById('statePending').className = 'text-slate-600 transition-all duration-300';
-            document.getElementById('stateCancelled').className = 'text-slate-600 transition-all duration-300';
-            document.getElementById('stateSuccess').className = 'text-slate-600 transition-all duration-300';
+        function setHUDState(state) {
+            document.getElementById('statePending').className = 'text-slate-600';
+            document.getElementById('stateSuccess').className = 'text-slate-600';
+            
+            if (state === 'pending') {
+                document.getElementById('statePending').className = 'text-amber-400 font-bold animate-pulse';
+            } else if (state === 'success') {
+                document.getElementById('stateSuccess').className = 'text-emerald-400 font-bold';
+            }
         }
 
-        // AI Poster Generation Routine Engine using HTML5 Canvas
-        function processAIPosterGeneration() {
+        // GENERATION ENGINE - EXTRACTS AND CONVERTS BACKGROUND ONLY
+        function generatePreservedBrandingPoster() {
             const title = document.getElementById('prodTitle').value.trim();
             const price = document.getElementById('prodPrice').value;
             const qty = document.getElementById('prodQty').value;
-            const slogan = document.getElementById('prodSlogan').value.trim() || "DEFINING THE NEXT APEX.";
+            const slogan = document.getElementById('prodSlogan').value.trim() || "UNTOUCHED DESIGN. ELITE PRESENTATION.";
 
             if (!uploadedScreenshotBase64) {
-                alert('Mandatory Error: Please upload a product screenshot image file first.');
+                alert('Action Required: Please upload a product screenshot image context.');
                 return;
             }
             if (!title || !price || !qty) {
-                alert('Validation Error: Please configure Brand Title, Price and Stock values.');
+                alert('Input Alert: All mandatory configurations are not defined.');
                 return;
             }
 
-            resetStateIndicators();
-            document.getElementById('statePending').className = 'text-amber-400 font-bold drop-shadow-[0_0_8px_rgba(251,191,36,0.5)] transition-all duration-300 animate-pulse';
+            setHUDState('pending');
 
-            // Create Canvas Image Compositor Engine
             const canvas = document.createElement('canvas');
             canvas.width = 1000;
             canvas.height = 1000;
             const ctx = canvas.getContext('2d');
 
-            // 1. Draw Premium Matte Black Background Base
-            const bgGrad = ctx.createLinearGradient(0, 0, 1000, 1000);
-            bgGrad.addColorStop(0, '#09090b');
-            bgGrad.addColorStop(0.5, '#141419');
-            bgGrad.addColorStop(1, '#020203');
-            ctx.fillStyle = bgGrad;
+            // 1. Recreate Website Aesthetic Base Theme Background (Matte Black Luxury Gradation)
+            const webBgGrad = ctx.createLinearGradient(0, 0, 1000, 1000);
+            webBgGrad.addColorStop(0, '#0c0c10');
+            webBgGrad.addColorStop(0.5, '#16161f');
+            webBgGrad.addColorStop(1, '#040406');
+            ctx.fillStyle = webBgGrad;
             ctx.fillRect(0, 0, 1000, 1000);
 
-            // 2. Draw Luxury Geometric Metallic Alignment Grid Frames
+            // 2. Inject Layered Glassmorphic Depth Panels & Refraction Rings
             ctx.strokeStyle = '#D4AF37';
-            ctx.lineWidth = 2;
-            ctx.globalAlpha = 0.15;
-            ctx.strokeRect(40, 40, 920, 920);
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.18;
             ctx.strokeRect(60, 60, 880, 880);
             
-            // Abstract Circles for 3D Depth Visual feel
-            ctx.beginPath();
-            ctx.arc(500, 450, 320, 0, Math.PI * 2);
-            ctx.stroke();
+            // Matte Gold Outer Spotlight Circle Glow Matrix
+            const focusGlow = ctx.createRadialGradient(500, 430, 50, 500, 430, 360);
+            focusGlow.addColorStop(0, 'rgba(212, 175, 55, 0.25)');
+            focusGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = focusGlow;
+            ctx.fillRect(60, 60, 880, 880);
             ctx.globalAlpha = 1.0;
 
-            // 3. Load, Process & Compound the Uploaded Screenshot Target Item
-            const imgInstance = new Image();
-            imgInstance.src = uploadedScreenshotBase64;
-            imgInstance.onload = function() {
-                // Draw a sleek luxury radial glow aura behind the screenshot element
-                const glowGrad = ctx.createRadialGradient(500, 450, 50, 500, 450, 350);
-                glowGrad.addColorStop(0, 'rgba(212, 175, 55, 0.15)');
-                glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                ctx.fillStyle = glowGrad;
-                ctx.fillRect(150, 100, 700, 700);
+            const productImg = new Image();
+            productImg.src = uploadedScreenshotBase64;
+            productImg.onload = function() {
+                
+                // Temporary buffer canvas layer for extracting original design without touching product structures
+                const bufferCanvas = document.createElement('canvas');
+                bufferCanvas.width = productImg.width;
+                bufferCanvas.height = productImg.height;
+                const bCtx = bufferCanvas.getContext('2d');
+                bCtx.drawImage(productImg, 0, 0);
+                
+                // Advanced pixel scanner logic to mask out whitish background elements from original upload
+                const imgData = bCtx.getImageData(0, 0, bufferCanvas.width, bufferCanvas.height);
+                const data = imgData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i], g = data[i+1], b = data[i+2];
+                    // If pixel matches general flat bright environment, make it transparent
+                    if (r > 220 && g > 220 && b > 220) {
+                        data[i+3] = 0; // Alpha channel to zero
+                    }
+                }
+                bCtx.putImageData(imgData, 0, 0);
 
-                // Add Premium Image Shadow effects to integrate screenshot seamlessly
+                // Apply premium structural shadow directly behind the exact untouched shape geometry bounds
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-                ctx.shadowBlur = 40;
-                ctx.shadowOffsetX = 0;
+                ctx.shadowBlur = 55;
                 ctx.shadowOffsetY = 25;
 
-                // Draw screenshot item inside isolated aesthetic boundary frame box
-                // Aspect calculation to stretch nicely inside poster workspace
-                const targetWidth = 550;
-                const targetHeight = 400;
-                const targetX = 500 - (targetWidth / 2);
-                const targetY = 430 - (targetHeight / 2);
-                
-                ctx.drawImage(imgInstance, targetX, targetY, targetWidth, targetHeight);
-                
-                // Reset shadow values for rendering pristine typography layers
+                // Render original untouched isolated product design directly over the custom luxury vectors
+                const targetW = 560;
+                const targetH = 420;
+                const posX = 500 - (targetW / 2);
+                const posY = 430 - (targetH / 2);
+                ctx.drawImage(bufferCanvas, posX, posY, targetW, targetH);
+
+                // Reset shadow mapping
                 ctx.shadowBlur = 0;
                 ctx.shadowOffsetY = 0;
 
-                // 4. Inject Premium High-End Luxury Typography Elements
-                // Draw Header Brand stamp
+                // 3. Corporate Web Theme Typography Branding Integration
                 ctx.fillStyle = '#D4AF37';
-                ctx.font = "900 18px 'Poppins', sans-serif";
+                ctx.font = "900 15px 'Poppins', sans-serif";
                 ctx.textAlign = 'center';
-                ctx.letterSpacing = "8px";
-                ctx.fillText("LUXÈ INTERNATIONAL APEX", 500, 110);
+                ctx.letterSpacing = "14px";
+                ctx.fillText("LUXÈ PRESERVED EXCLUSIVE SHOWCASE", 500, 110);
 
-                // Draw Centralized Metallic Divider Lines
-                ctx.fillStyle = 'rgba(212, 175, 55, 0.3)';
-                ctx.fillRect(400, 130, 200, 1);
-
-                // Draw Main Title Name Heading Layer
                 ctx.fillStyle = '#ffffff';
-                ctx.font = "bold 52px 'Cinzel', serif";
-                ctx.letterSpacing = "4px";
-                ctx.fillText(title.toUpperCase(), 500, 740);
+                ctx.font = "bold 56px 'Cinzel', serif";
+                ctx.letterSpacing = "3px";
+                ctx.fillText(title.toUpperCase(), 500, 730);
 
-                // Draw Slogan Subtext Layer
                 ctx.fillStyle = '#a1a1a6';
                 ctx.font = "300 18px 'Poppins', sans-serif";
-                ctx.letterSpacing = "3px";
-                ctx.fillText(slogan.toUpperCase(), 500, 785);
+                ctx.letterSpacing = "4px";
+                ctx.fillText(slogan.toUpperCase(), 500, 780);
 
-                // Draw Pricing Badges
                 ctx.fillStyle = '#D4AF37';
-                ctx.font = "600 36px 'Poppins', sans-serif";
-                ctx.letterSpacing = "1px";
+                ctx.font = "600 38px 'Poppins', sans-serif";
                 ctx.fillText(`₹${Number(price).toLocaleString('en-IN')}`, 500, 845);
 
-                // Base Status Signatures
                 ctx.fillStyle = '#4b5563';
-                ctx.font = "600 12px 'Poppins', sans-serif";
-                ctx.letterSpacing = "4px";
-                ctx.fillText(`LIMITED INTEGRATION MATRIX • ALLOCATION [${qty}]`, 500, 910);
+                ctx.font = "600 11px 'Poppins', sans-serif";
+                ctx.letterSpacing = "6px";
+                ctx.fillText(`DIGITAL CATALOG RECORD MATRIX • LIVE UNITS: ${qty}`, 500, 915);
 
-                // Extract flattened high-end compiled asset data string
-                const finalizedPosterDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                const finalCompositeDataUrl = canvas.toDataURL('image/jpeg', 0.96);
 
-                // Packaging complete object payload maps to broadcast to index pipeline
                 activePosterPayload = {
                     id: Date.now(),
                     title: title.toUpperCase(),
                     price: Number(price),
                     quantity: Number(qty),
-                    description: `Custom automated poster asset composite. Built by targets derived from local file screenshot uploads matching matte industrial catalog parameters. Slogan text validation: "${slogan}".`,
-                    image: finalizedPosterDataUrl,
-                    provider: "AI Poster Engine"
+                    description: `Unaltered original product configuration mapped over automated web interface luxury theme presets. Background upgraded to glass frosted layers.`,
+                    image: finalCompositeDataUrl,
+                    provider: "Preserve AI Engine"
                 };
 
-                // Output image source map configurations
-                document.getElementById('outPosterImage').src = finalizedPosterDataUrl;
-
-                // Render visibility settings toggles
+                document.getElementById('outPosterImage').src = finalCompositeDataUrl;
                 document.getElementById('sandboxEmpty').classList.add('hidden');
                 document.getElementById('sandboxData').classList.remove('hidden');
                 document.getElementById('actionContainer').classList.remove('hidden');
             };
         }
 
-        // STEP 2: Save compiled Poster Matrix Array to live local storage structures
-        function uploadPosterToLiveCatalog() {
+        function commitAssetToLiveCatalog() {
             if (!activePosterPayload) return;
-
-            const uploadBtn = document.getElementById('btnUpload');
-            uploadBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i> Uploading to Catalog...`;
-            uploadBtn.disabled = true;
+            const syncButton = document.getElementById('btnUpload');
+            syncButton.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Dispatching...`;
+            syncButton.disabled = true;
 
             setTimeout(() => {
-                const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                db.push(activePosterPayload);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+                const currentDB = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                currentDB.push(activePosterPayload);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentDB));
 
-                resetStateIndicators();
-                document.getElementById('stateSuccess').className = 'text-emerald-400 font-bold drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] transition-all duration-300';
-                
-                alert('Success! Ultra premium branding poster uploaded and synced with live catalog successfully.');
-                
-                clearConsole();
+                setHUDState('success');
+                alert('Success! Custom background branding artifact dispatched to main storefront index grid view layout.');
+                resetSandboxTerminal();
                 document.getElementById('posterForm').reset();
                 
-                // Clear upload files contexts
                 uploadedScreenshotBase64 = '';
                 document.getElementById('screenshotInput').value = '';
                 document.getElementById('uploadPlaceholder').classList.remove('hidden');
                 document.getElementById('sourcePreviewContainer').classList.add('hidden');
 
-                uploadBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> 2. Upload to Live Store`;
-                uploadBtn.disabled = false;
-            }, 1000);
+                syncButton.innerHTML = `<i class="fa-solid fa-circle-check mr-1.5"></i> 2. Push to Website Catalog`;
+                syncButton.disabled = false;
+            }, 800);
         }
 
-        function triggerCancelState() {
-            resetStateIndicators();
-            document.getElementById('stateCancelled').className = 'text-rose-500 font-bold drop-shadow-[0_0_8px_rgba(244,63,94,0.5)] transition-all duration-300';
-            alert('Cancelled: Branding poster generation pipeline dropped.');
-            clearConsole();
-        }
-
-        function clearConsole() {
+        function resetSandboxTerminal() {
             activePosterPayload = null;
             document.getElementById('outPosterImage').src = '';
             document.getElementById('sandboxData').classList.add('hidden');
             document.getElementById('actionContainer').classList.add('hidden');
             document.getElementById('sandboxEmpty').classList.remove('hidden');
+            document.getElementById('statePending').className = 'text-slate-600';
+            document.getElementById('stateSuccess').className = 'text-slate-600';
         }
     </script>
 </body>
