@@ -1,184 +1,143 @@
-diff --git a/index.html b/index.html
-index 58ecec9c82e760e06f2ce6d0fe9aaed93f4e4501..b3b73237961de56d6bfd203e68355840316a6486 100644
---- a/index.html
-+++ b/index.html
-@@ -1,86 +1,134 @@
- <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
--    <title>Batak Store - Premium Catalog</title>
-+    <title>Shopyy AI Store - Auto Catalog</title>
-     <script src="https://cdn.tailwindcss.com"></script>
- </head>
- <body class="bg-slate-950 text-slate-100 min-h-screen">
- 
--    <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
--        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
--            <h1 class="text-2xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent tracking-wider">🦆 BATAK AI</h1>
--            <div class="flex items-center gap-6">
-+    <nav class="border-b border-slate-800 bg-slate-900/70 backdrop-blur sticky top-0 z-50">
-+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-+            <div>
-+                <h1 class="text-2xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent tracking-wider">🦆 SHOPYY AUTO-AI</h1>
-+                <p class="text-xs text-slate-500">Free browser catalog with auto image + description generation</p>
-+            </div>
-+            <div class="flex items-center gap-4">
-                 <a href="admin.html" class="text-sm font-semibold text-amber-400 hover:underline">⚡ AI Admin Panel</a>
-                 <div class="relative bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
-                     🛒 Cart (<span id="cartCount" class="font-bold text-amber-400">0</span>)
-                 </div>
-             </div>
-         </div>
-     </nav>
- 
-     <main class="max-w-6xl mx-auto px-4 py-12">
-         <div class="text-center mb-12">
--            <h2 class="text-4xl font-extrabold mb-2">Batak AI Live Catalog</h2>
--            <p class="text-slate-400 text-sm">Products uploaded from your secret AI dashboard will instantly show up here.</p>
-+            <p class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-2 mb-4">Gemini / Canva style local AI mode</p>
-+            <h2 class="text-4xl font-extrabold mb-2">Live Auto-Generated Catalog</h2>
-+            <p class="text-slate-400 text-sm max-w-2xl mx-auto">Products created from the admin panel sync here instantly. If no image is uploaded, the panel generates a free browser-made product visual automatically.</p>
-         </div>
- 
--        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
--            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden p-4 shadow-xl">
--                <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800/50">
--                    <span class="text-slate-600 text-5xl">🥚</span>
--                </div>
--                <div class="mt-4">
--                    <div class="flex justify-between items-start mb-2">
--                        <h3 class="text-lg font-bold text-white">Default Sample Variant</h3>
--                        <span class="text-amber-400 font-black text-xl">₹99</span>
--                    </div>
--                    <p class="text-sm text-slate-400 line-clamp-2 mb-4">Go to AI Admin Panel to upload your customized screenshots and live sync real items.</p>
--                    <button onclick="addToCart(99)" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition-all border border-slate-700">
--                        Add To Cart
--                    </button>
-+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-+    </main>
-+
-+    <template id="emptyCatalogTemplate">
-+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden p-4 shadow-xl">
-+            <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800/50">
-+                <span class="text-slate-600 text-5xl">🥚</span>
-+            </div>
-+            <div class="mt-4">
-+                <div class="flex justify-between items-start mb-2 gap-4">
-+                    <h3 class="text-lg font-bold text-white">Sample AI Product</h3>
-+                    <span class="text-amber-400 font-black text-xl">₹99</span>
-                 </div>
-+                <p class="text-sm text-slate-400 line-clamp-3 mb-4">Go to AI Admin Panel to generate an image, auto-write a description, and sync real products to this store.</p>
-+                <button onclick="addToCart(99)" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition-all border border-slate-700">
-+                    Add To Cart
-+                </button>
-             </div>
-         </div>
--    </main>
-+    </template>
- 
-     <script>
-+        const STORAGE_KEY = 'shopyy_products';
-+        const LEGACY_KEYS = ['batak_products', 'shopyy_productss'];
-         let cartCount = 0;
-+
-         function addToCart(price) {
-             cartCount++;
-             document.getElementById('cartCount').innerText = cartCount;
--            alert(`Item added to cart! Price: ₹${price}`);
-+            alert(`Item added to cart! Price: ₹${Number(price || 0).toLocaleString('en-IN')}`);
-+        }
-+
-+        function escapeHTML(value) {
-+            return String(value || '').replace(/[&<>'"]/g, char => ({
-+                '&': '&amp;',
-+                '<': '&lt;',
-+                '>': '&gt;',
-+                "'": '&#39;',
-+                '"': '&quot;'
-+            }[char]));
-+        }
-+
-+        function getProducts() {
-+            const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-+            const migrated = LEGACY_KEYS.flatMap(key => JSON.parse(localStorage.getItem(key) || '[]'));
-+            const allProducts = [...current, ...migrated];
-+
-+            if (migrated.length) {
-+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allProducts));
-+                LEGACY_KEYS.forEach(key => localStorage.removeItem(key));
-+            }
-+
-+            return allProducts;
-+        }
-+
-+        function renderProduct(product) {
-+            const safeTitle = escapeHTML(product.title || 'Untitled Product');
-+            const safeDescription = escapeHTML(product.description || 'Auto-generated product listing.');
-+            const safeImage = escapeHTML(product.image || '');
-+            const safeProvider = escapeHTML(product.provider || 'Browser AI');
-+            const price = Number(product.price || 0);
-+            const quantity = Number(product.quantity || 0);
-+
-+            const card = document.createElement('div');
-+            card.className = 'bg-slate-900 border border-amber-500/20 shadow-lg shadow-amber-500/5 rounded-2xl overflow-hidden p-4 relative';
-+            card.innerHTML = `
-+                <div class="absolute top-3 right-3 bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full">${safeProvider}</div>
-+                <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800">
-+                    <img src="${safeImage}" class="h-full w-full object-cover" alt="${safeTitle}" />
-+                </div>
-+                <div class="mt-4">
-+                    <div class="flex justify-between items-start mb-2 gap-4">
-+                        <h3 class="text-lg font-bold text-white leading-tight">${safeTitle}</h3>
-+                        <span class="text-amber-400 font-black text-xl whitespace-nowrap">₹${price.toLocaleString('en-IN')}</span>
-+                    </div>
-+                    <p class="text-xs text-slate-500 mb-2">Stock: ${quantity.toLocaleString('en-IN')} items</p>
-+                    <p class="text-sm text-slate-400 line-clamp-3 mb-4">${safeDescription}</p>
-+                    <button onclick="addToCart(${price})" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold py-2.5 rounded-xl transition-all shadow-md">
-+                        Add To Cart
-+                    </button>
-+                </div>
-+            `;
-+            return card;
-         }
- 
-         function loadAIProducts() {
--            const products = JSON.parse(localStorage.getItem('batak_products')) || [];
-+            const products = getProducts();
-             const grid = document.getElementById('productGrid');
-+            grid.innerHTML = '';
- 
--            products.forEach(product => {
--                const card = document.createElement('div');
--                card.className = "bg-slate-900 border border-amber-500/20 shadow-lg shadow-amber-500/5 rounded-2xl overflow-hidden p-4 relative";
--                card.innerHTML = `
--                    <div class="absolute top-3 right-3 bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full">AI AUTOMATED</div>
--                    <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800">
--                        <img src="${product.image}" class="max-h-full max-w-full object-contain" alt="Product Image" />
--                    </div>
--                    <div class="mt-4">
--                        <div class="flex justify-between items-start mb-2">
--                            <h3 class="text-lg font-bold text-white">${product.title}</h3>
--                            <span class="text-amber-400 font-black text-xl">₹${product.price}</span>
--                        </div>
--                        <p class="text-sm text-slate-400 line-clamp-3 mb-4">${product.description}</p>
--                        <button onclick="addToCart(${product.price})" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold py-2.5 rounded-xl transition-all shadow-md">
--                            Add To Cart
--                        </button>
--                    </div>
--                `;
--                grid.appendChild(card);
--            });
-+            if (!products.length) {
-+                grid.appendChild(document.getElementById('emptyCatalogTemplate').content.cloneNode(true));
-+                return;
-+            }
-+
-+            products.slice().reverse().forEach(product => grid.appendChild(renderProduct(product)));
-         }
- 
-         window.onload = loadAIProducts;
-     </script>
- </body>
- </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopyy AI Store - Auto Catalog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <nav class="border-b border-slate-800 bg-slate-900/70 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+            <div>
+                <h1 class="text-2xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent tracking-wider">🦆 SHOPYY AUTO-AI</h1>
+                <p class="text-xs text-slate-500">Free browser catalog with auto image + description generation</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="admin.html" class="text-sm font-semibold text-amber-400 hover:underline">⚡ AI Admin Panel</a>
+                <div class="relative bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
+                    🛒 Cart (<span id="cartCount" class="font-bold text-amber-400">0</span>)
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <p class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-2 mb-4">Gemini / Canva style local AI mode</p>
+            <h2 class="text-4xl font-extrabold mb-2">Live Auto-Generated Catalog</h2>
+            <p class="text-slate-400 text-sm max-w-2xl mx-auto">Products created from the admin panel sync here instantly. If no image is uploaded, the panel generates a free browser-made product visual automatically.</p>
+        </div>
+
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    </main>
+
+    <template id="emptyCatalogTemplate">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden p-4 shadow-xl">
+            <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800/50">
+                <span class="text-slate-600 text-5xl">🥚</span>
+            </div>
+            <div class="mt-4">
+                <div class="flex justify-between items-start mb-2 gap-4">
+                    <h3 class="text-lg font-bold text-white">Sample AI Product</h3>
+                    <span class="text-amber-400 font-black text-xl">₹99</span>
+                </div>
+                <p class="text-sm text-slate-400 line-clamp-3 mb-4">Go to AI Admin Panel to generate an image, auto-write a description, and sync real products to this store.</p>
+                <button onclick="addToCart(99)" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition-all border border-slate-700">
+                    Add To Cart
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        const STORAGE_KEY = 'shopyy_products';
+        const LEGACY_KEYS = ['batak_products', 'shopyy_productss'];
+        let cartCount = 0;
+
+        function addToCart(price) {
+            cartCount++;
+            document.getElementById('cartCount').innerText = cartCount;
+            alert(`Item added to cart! Price: ₹${Number(price || 0).toLocaleString('en-IN')}`);
+        }
+
+        // Security / XSS Prevention function
+        function escapeHTML(value) {
+            return String(value || '').replace(/[&<>'"]/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[char]));
+        }
+
+        // Fetch & Merge old product arrays into the main storage key
+        function getProducts() {
+            const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const migrated = LEGACY_KEYS.flatMap(key => JSON.parse(localStorage.getItem(key) || '[]'));
+            const allProducts = [...current, ...migrated];
+
+            if (migrated.length) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allProducts));
+                LEGACY_KEYS.forEach(key => localStorage.removeItem(key));
+            }
+
+            return allProducts;
+        }
+
+        // Generates clean product card item 
+        function renderProduct(product) {
+            const safeTitle = escapeHTML(product.title || 'Untitled Product');
+            const safeDescription = escapeHTML(product.description || 'Auto-generated product listing.');
+            const safeImage = product.image || ''; // URLs/Base64 can remain raw but safely placed in src
+            const safeProvider = escapeHTML(product.provider || 'Browser AI');
+            const price = Number(product.price || 0);
+            const quantity = Number(product.quantity || 0);
+
+            const card = document.createElement('div');
+            card.className = 'bg-slate-900 border border-amber-500/20 shadow-lg shadow-amber-500/5 rounded-2xl overflow-hidden p-4 relative flex flex-col justify-between';
+            card.innerHTML = `
+                <div>
+                    <div class="absolute top-3 right-3 bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">${safeProvider}</div>
+                    <div class="w-full h-48 bg-slate-950 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800">
+                        <img src="${safeImage}" class="h-full w-full object-cover" alt="${safeTitle}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23334155\'><rect width=\'100\' height=\'100\'/><text x=\'50%\' y=\'55%\' text-anchor=\'middle\' fill=\'%2364748b\' font-size=\'30\'>📦</text></svg>'"/>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex justify-between items-start mb-2 gap-4">
+                            <h3 class="text-lg font-bold text-white leading-tight break-words">${safeTitle}</h3>
+                            <span class="text-amber-400 font-black text-xl whitespace-nowrap">₹${price.toLocaleString('en-IN')}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-medium mb-2">Available Stock: ${quantity.toLocaleString('en-IN')} units</p>
+                        <p class="text-sm text-slate-400 line-clamp-3 mb-4">${safeDescription}</p>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="addToCart(${price})" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black py-2.5 rounded-xl transition-all shadow-md hover:opacity-90 active:scale-[0.98]">
+                        Add To Cart
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        // Initialize grid rendering
+        function loadAIProducts() {
+            const products = getProducts();
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            if (!products.length) {
+                grid.appendChild(document.getElementById('emptyCatalogTemplate').content.cloneNode(true));
+                return;
+            }
+
+            // Displays latest created item first
+            products.slice().reverse().forEach(product => grid.appendChild(renderProduct(product)));
+        }
+
+        window.onload = loadAIProducts;
+    </script>
+</body>
+</html>
