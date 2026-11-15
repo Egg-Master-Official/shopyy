@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Captain Tractors QA - Control Plan & PFMEA Generator</title>
+    <!-- SheetJS for Excel Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- PDF.js for Reading PDF Drawings -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root {
@@ -176,7 +178,7 @@
     <div class="upload-card" onclick="document.getElementById('pdfFile').click()">
         <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--primary); margin-bottom:10px;"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
         <h3 id="uploadStatusText" style="margin:5px 0; color:var(--primary);">Click to Upload Part Drawing (PDF / Image)</h3>
-        <p style="margin:0; color:#666; font-size:13px;">Automatically reads PDF, extracts Part Number & Title cleanly, and wipes old cache</p>
+        <p style="margin:0; color:#666; font-size:13px;">Automatically reads PDF text, extracts Part No & Title, and prevents data mixing</p>
         <input type="file" id="pdfFile" accept=".pdf,.png,.jpg,.jpeg" onchange="processDrawing(event)">
     </div>
 
@@ -258,7 +260,7 @@
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // Master database templates
+    // Master database templates for recognized parts
     const drawingDatabase = {
         "11216040": {
             partName: "UNIVERSAL JOINT COVER REAR",
@@ -303,7 +305,6 @@
     let currentPfmeaData = [];
 
     function resetApp() {
-        // Completely wipe input and editor state
         document.getElementById('pdfFile').value = '';
         document.getElementById('editorSection').style.display = 'none';
         document.getElementById('partNo').value = '';
@@ -324,7 +325,7 @@
         const file = event.target.files[0];
         if (!file) return;
 
-        // 1. Instantly hide editor and clear old tables to prevent mix-up
+        // Immediately wipe old tables and hide section to prevent caching/mixing
         document.getElementById('editorSection').style.display = 'none';
         document.getElementById('cpTableBody').innerHTML = '';
         document.getElementById('pfmeaTableBody').innerHTML = '';
@@ -357,11 +358,10 @@
         setTimeout(() => {
             let upperText = (extractedText + " " + file.name).toUpperCase();
             
-            // Extract Part Number (look for 6 to 8 digit part numbers like 11216040, 11205090, 11206656, etc.)
-            let partNoMatch = upperText.match(/ (112\d{5}|1120\d{4}) /) || file.name.match(/\d{6,8}/);
+            // Extract Part Number (6 to 8 digit part numbers)
+            let partNoMatch = upperText.match(/\b(112\d{5}|1120\d{4})\b/) || file.name.match(/\d{6,8}/);
             let matchedKey = partNoMatch ? partNoMatch[0] : "11216040";
 
-            // Extract Part Name cleanly from filename if possible
             let cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
             
             let data = drawingDatabase[matchedKey] || {
@@ -383,7 +383,7 @@
                 ]
             };
 
-            // Populate form fields with fresh data
+            // Populate form fields
             document.getElementById('partNo').value = matchedKey;
             document.getElementById('partName').value = data.partName;
             document.getElementById('material').value = data.material;
@@ -436,7 +436,7 @@
     function generateExcelFiles() {
         const partNum = document.getElementById('partNo').value || "11216040";
         
-        // 1. Control Plan
+        // 1. Control Plan Excel
         const wbCP = XLSX.utils.book_new();
         let cpSheetData = [
             ["", "PROCESS CONTROL PLAN", "", "", "", "", "", "", "", "", "", "", "Format No.: M QC 02"],
@@ -452,13 +452,13 @@
         XLSX.utils.book_append_sheet(wbCP, wsCP, "Control Plan");
         XLSX.writeFile(wbCP, `CONTROL_PLAN_${partNum}.xlsx`);
 
-        // 2. PFMEA
+        // 2. PFMEA Excel
         const wbPFMEA = XLSX.utils.book_new();
         let pfmeaSheetData = [
             ["", "POTENTIAL FAILURE MODE AND EFFECTS ANALYSIS (PROCESS FMEA)"],
             ["", "", "", "", "", "", "Team:", document.getElementById('coreTeam').value],
             ["Part No.", partNum, "", "Rev.", document.getElementById('revLevel').value, "", "", "", "", "", "", "FMEA Number:", "", `PFMEA/CAPT/${partNum}`],
-            ["Part Name.", document.getElementById('partName'].value],
+            ["Part Name.", document.getElementById('partName').value],
             [],
             ["Process / Function Requirements", "Potential Failure Mode", "Potential Effect(s) of Failure", "Severity S", "Class", "Potential Cause(s) of Failure", "Current Controls - Prevention", "Occurrence O", "Current Controls - Detection", "Detection D", "RPN"]
         ];
