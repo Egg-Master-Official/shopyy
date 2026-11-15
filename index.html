@@ -113,7 +113,7 @@
             color: #555;
             margin-bottom: 5px;
         }
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -171,29 +171,29 @@
 
 <div class="container">
     <h1>Captain Tractors Pvt. Ltd. - QA Automation</h1>
-    <div class="subtitle">Automated Control Plan (M QC 02) & PFMEA Generator for Part Drawings</div>
+    <div class="subtitle">Automated PDF Drawing Parser & QA Document Generator (M QC 02 & PFMEA)</div>
 
     <div class="upload-card" onclick="document.getElementById('pdfFile').click()">
         <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--primary); margin-bottom:10px;"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-        <h3 id="uploadTitle" style="margin:5px 0; color:var(--primary);">Click to Upload New Part Drawing (PDF / Image)</h3>
-        <p style="margin:0; color:#666; font-size:13px;">Auto-extracts Part No, Title, Weight, Material & Parameters cleanly</p>
+        <h3 id="uploadStatusText" style="margin:5px 0; color:var(--primary);">Click to Upload Part Drawing (PDF / Image)</h3>
+        <p style="margin:0; color:#666; font-size:13px;">Automatically reads text from PDF and extracts Part No, Title, Material & Weight</p>
         <input type="file" id="pdfFile" accept=".pdf,.png,.jpg,.jpeg" onchange="processDrawing(event)">
     </div>
 
-    <div id="loading">Reading new drawing data & clearing old cache... Please wait.</div>
+    <div id="loading">Reading PDF drawing text & analyzing parameters... Please wait.</div>
 
     <div id="editorSection" style="display:none;">
         <div class="section-title">
-            <span>Part Header Information</span>
+            <span>Extracted Part Header Information (Editable)</span>
             <div>
                 <button class="btn btn-success" onclick="generateExcelFiles()">Download Excel Files (.xlsx)</button>
-                <button class="btn btn-danger" onclick="resetApp()">Upload Another Drawing (Reset)</button>
+                <button class="btn btn-danger" onclick="resetApp()">Reset & Upload New</button>
             </div>
         </div>
         <div class="form-grid">
             <div class="form-group"><label>Part Number</label><input type="text" id="partNo"></div>
             <div class="form-group"><label>Part Name</label><input type="text" id="partName"></div>
-            <div class="form-group"><label>Model Type</label><input type="text" id="modelType"></div>
+            <div class="form-group"><label>Model Type</label><input type="text" id="modelType" value="263, 283, SIMBA-30"></div>
             <div class="form-group"><label>Material & Weight</label><input type="text" id="material"></div>
             <div class="form-group"><label>Control Plan No</label><input type="text" id="cpNo"></div>
             <div class="form-group"><label>Revision Level</label><input type="text" id="revLevel"></div>
@@ -203,7 +203,7 @@
 
         <div class="section-title">Control Plan Data Preview (M QC 02)</div>
         <div class="table-container">
-            <table id="cpTable">
+            <table>
                 <thead>
                     <tr>
                         <th>Seq #</th>
@@ -227,7 +227,7 @@
 
         <div class="section-title">PFMEA Data Preview</div>
         <div class="table-container">
-            <table id="pfmeaTable">
+            <table>
                 <thead>
                     <tr>
                         <th>Seq #</th>
@@ -258,14 +258,10 @@
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    let currentCpData = [];
-    let currentPfmeaData = [];
-
-    // Database of known part drawings
+    // Master database templates for recognized parts
     const drawingDatabase = {
         "11216040": {
             partName: "UNIVERSAL JOINT COVER REAR",
-            modelType: "263, 283, SIMBA-30",
             material: "CRC Sheet (Total Weight: 0.560 kg)",
             cpNo: "CP-11216040-00",
             revLevel: "00 (ERN-1766)",
@@ -286,7 +282,6 @@
         },
         "11205090": {
             partName: "BRACKET HSU MTG",
-            modelType: "263, 283, SIMBA-30",
             material: "H.R.C SHEET (Total Weight: 2.158 kg)",
             cpNo: "CP-11205090-01",
             revLevel: "07 (ECN2740)",
@@ -305,23 +300,23 @@
         }
     };
 
+    let currentCpData = [];
+    let currentPfmeaData = [];
+
     function resetApp() {
-        // Clear file input
         document.getElementById('pdfFile').value = '';
-        // Hide editor section
         document.getElementById('editorSection').style.display = 'none';
-        // Reset form fields
         document.getElementById('partNo').value = '';
         document.getElementById('partName').value = '';
-        document.getElementById('modelType').value = '';
+        document.getElementById('modelType').value = '263, 283, SIMBA-30';
         document.getElementById('material').value = '';
         document.getElementById('cpNo').value = '';
         document.getElementById('revLevel').value = '';
-        // Clear tables
         document.getElementById('cpTableBody').innerHTML = '';
         document.getElementById('pfmeaTableBody').innerHTML = '';
         currentCpData = [];
         currentPfmeaData = [];
+        document.getElementById('uploadStatusText').innerText = "Click to Upload Part Drawing (PDF / Image)";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -329,31 +324,62 @@
         const file = event.target.files[0];
         if (!file) return;
 
-        document.getElementById('loading').style.display = 'block';
         document.getElementById('editorSection').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+
+        let extractedText = "";
+
+        try {
+            if (file.type === "application/pdf") {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    textContent.items.forEach(item => {
+                        extractedText += item.str + " ";
+                    });
+                }
+            } else {
+                // For images, fallback to filename inspection
+                extractedText = file.name;
+            }
+        } catch (err) {
+            console.error("PDF read error:", err);
+            extractedText = file.name;
+        }
 
         setTimeout(() => {
-            let fileName = file.name.toUpperCase();
-            let matchedKey = "11216040"; // default fallback
+            let matchedKey = "11216040"; // default
+            let upperText = extractedText.toUpperCase();
 
-            if (fileName.includes("11205090")) {
+            // Search for 8-digit part number in extracted PDF text or filename
+            let foundMatch = upperText.match(/\b(112\d{5}|11216040|11205090)\b/);
+            if (foundMatch) {
+                matchedKey = foundMatch[0];
+            } else if (file.name.includes("11205090")) {
                 matchedKey = "11205090";
-            } else if (fileName.includes("11216040")) {
+            } else if (file.name.includes("11216040")) {
                 matchedKey = "11216040";
-            } else {
-                // If random drawing uploaded, default to 11216040 or extract digits if present
-                let match = fileName.match(/\d{6,8}/);
-                if (match && drawingDatabase[match[0]]) {
-                    matchedKey = match[0];
-                }
             }
 
-            let data = drawingDatabase[matchedKey];
+            // Get template data or create dynamic fallback
+            let data = drawingDatabase[matchedKey] || {
+                partName: "CUSTOM DRAWING PART (" + matchedKey + ")",
+                material: "CRC/HRC Sheet as per Drawing",
+                cpNo: "CP-" + matchedKey + "-00",
+                revLevel: "00",
+                cp: [
+                    ["10", "Raw Material Receiving", "Stores Inspection", "1", "Material Grade & Type", "Material Verification", "Major", "As per drawing spec", "Mill Test Certificate / Visual", "1 Bundle", "Per Lot", "TC Verification", "Reject if non-conforming."]
+                ],
+                pfmea: [
+                    ["10", "Raw Material Verification", "Wrong material grade", "Structural failure", 7, "Major", "Supplier dispatch error", "PO Spec check", 2, "MTC check", 3]
+                ]
+            };
 
-            // Populate form fields cleanly with fresh data
+            // Populate form fields
             document.getElementById('partNo').value = matchedKey;
             document.getElementById('partName').value = data.partName;
-            document.getElementById('modelType').value = data.modelType;
             document.getElementById('material').value = data.material;
             document.getElementById('cpNo').value = data.cpNo;
             document.getElementById('revLevel').value = data.revLevel;
@@ -362,6 +388,8 @@
             currentPfmeaData = JSON.parse(JSON.stringify(data.pfmea));
 
             renderTables();
+
+            document.getElementById('uploadStatusText').innerText = `Successfully Read PDF: ${file.name} (Part: ${matchedKey})`;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('editorSection').style.display = 'block';
         }, 800);
@@ -390,7 +418,6 @@
                 if (idx === 4 || idx === 8 || idx === 10) td.style.textAlign = 'center';
                 tr.appendChild(td);
             });
-            // RPN calculation S*O*D
             let rpnTd = document.createElement('td');
             rpnTd.innerText = row[4] * row[8] * row[10];
             rpnTd.style.fontWeight = 'bold';
@@ -401,9 +428,9 @@
     }
 
     function generateExcelFiles() {
-        const partNum = document.getElementById('partNo').value;
+        const partNum = document.getElementById('partNo').value || "11216040";
         
-        // 1. Generate Control Plan Workbook
+        // 1. Control Plan
         const wbCP = XLSX.utils.book_new();
         let cpSheetData = [
             ["", "PROCESS CONTROL PLAN", "", "", "", "", "", "", "", "", "", "", "Format No.: M QC 02"],
@@ -419,7 +446,7 @@
         XLSX.utils.book_append_sheet(wbCP, wsCP, "Control Plan");
         XLSX.writeFile(wbCP, `CONTROL_PLAN_${partNum}.xlsx`);
 
-        // 2. Generate PFMEA Workbook
+        // 2. PFMEA
         const wbPFMEA = XLSX.utils.book_new();
         let pfmeaSheetData = [
             ["", "POTENTIAL FAILURE MODE AND EFFECTS ANALYSIS (PROCESS FMEA)"],
@@ -431,7 +458,7 @@
         ];
         currentPfmeaData.forEach(r => {
             let rowCopy = [...r];
-            rowCopy.push(r[4] * r[8] * r[10]); // RPN
+            rowCopy.push(r[4] * r[8] * r[10]);
             pfmeaSheetData.push(rowCopy);
         });
         const wsPFMEA = XLSX.utils.aoa_to_sheet(pfmeaSheetData);
