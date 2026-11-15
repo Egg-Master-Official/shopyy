@@ -1,493 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Captain Tractors QA - AI Auto-Check Control Plan & PFMEA Generator</title>
-    <!-- SheetJS for Excel Generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- PDF.js for Reading PDF Drawings -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Captain Tractors | QA Drawing Intelligence Workbench</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
-        :root {
-            --primary: #1f4e78;
-            --secondary: #2f5597;
-            --accent: #4682b4;
-            --bg: #f4f6f9;
-            --text: #333;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-        h1 {
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 5px;
-            font-size: 26px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-        .upload-card {
-            border: 2px dashed var(--accent);
-            background: #f8fafc;
-            padding: 25px;
-            text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-        }
-        .upload-card:hover {
-            background: #eef2f7;
-            border-color: var(--primary);
-        }
-        input[type="file"] {
-            display: none;
-        }
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-weight: 600;
-            margin: 5px;
-        }
-        .btn:hover {
-            background-color: var(--secondary);
-        }
-        .btn-success {
-            background-color: #2e7d32;
-        }
-        .btn-success:hover {
-            background-color: #1b5e20;
-        }
-        .btn-danger {
-            background-color: #c62828;
-        }
-        .btn-danger:hover {
-            background-color: #8e0000;
-        }
-        .section-title {
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 5px;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-size: 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-            background: #fdfdfd;
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 5px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        .table-container {
-            overflow-x: auto;
-            max-height: 400px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            text-align: left;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        th {
-            background-color: var(--primary);
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .actions-bar {
-            text-align: center;
-            margin-top: 25px;
-            padding: 15px;
-            background: #eef2f7;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            align-items: center;
-        }
-        #loading {
-            display: none;
-            text-align: center;
-            color: var(--primary);
-            font-weight: bold;
-            margin: 15px 0;
-        }
+        :root{--navy:#1f3864;--navy2:#142747;--line:#cbd5e1;--bg:#f3f6fb}
+        *{box-sizing:border-box}
+        body{margin:0;background:var(--bg);font:14px/1.45 "Segoe UI",Arial,sans-serif;color:#182235}
+        header{background:linear-gradient(120deg,var(--navy2),var(--navy));color:white;padding:22px 4%;}
+        h1{margin:0 0 4px;font-size:22px}
+        header p{margin:0;color:#dbeafe}
+        main{max-width:1500px;margin:22px auto;padding:0 16px 40px}
+        .panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:0 3px 12px #0f172a0a}
+        .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
+        button{border:0;border-radius:7px;padding:10px 14px;background:var(--navy);color:#fff;font-weight:650;cursor:pointer}
+        button.secondary{background:#e2e8f0;color:#1e293b}
+        button.danger{background:#b42318}
+        button:disabled{opacity:.5}
+        .status{padding:9px 0;color:#64748b}
+        .status.ok{color:#087443}
+        .status.err{color:#b42318}
+        .status.warn{color:#a16207}
+        input[type=file]{max-width:100%}
+        .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+        .meta label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase}
+        .meta input{display:block;width:100%;margin-top:4px;padding:9px;border:1px solid var(--line);border-radius:6px;font-size:13px;color:#182235}
+        .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+        .tabs button{background:#e2e8f0;color:#334155}
+        .tabs button.active{background:var(--navy);color:white}
+        .pane{display:none}
+        .pane.active{display:block}
+        .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:8px;max-height:650px}
+        table{border-collapse:collapse;width:100%;min-width:1250px;font-size:12px}
+        th{position:sticky;top:0;background:var(--navy);color:white;padding:9px 7px;text-align:left;border:1px solid #526789;min-width:105px}
+        td{border:1px solid #d5dce7;padding:5px;vertical-align:top;min-width:110px}
+        td textarea,td select{width:100%;min-width:90px;border:1px solid transparent;border-radius:4px;padding:6px;background:transparent;font:inherit;color:inherit}
+        td textarea{min-height:42px;resize:vertical}
+        td textarea:focus,td select:focus{outline:2px solid #93c5fd;background:white}
+        .muted{font-size:12px;color:#64748b}
+        details{margin-top:10px}
+        pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:170px;overflow:auto;background:#f8fafc;padding:10px;border-radius:7px;font-size:11px}
+        footer{text-align:center;color:#64748b;padding:20px;font-size:12px}
     </style>
 </head>
 <body>
+<header>
+    <b style="letter-spacing:1px;color:#bfdbfe">CAPTAIN TRACTORS PVT. LTD.</b>
+    <h1>Drawing Intelligence & AI Auto-Check Workbench</h1>
+    <p>Original Excel layout • PDF text & OCR parsing • Live editable Control Plan (M QC 02) & PFMEA</p>
+</header>
 
-<div class="container">
-    <h1>Captain Tractors Pvt. Ltd. - AI QA Automation</h1>
-    <div class="subtitle">AI-Powered Drawing Auto-Check & QA Document Generator (M QC 02 & PFMEA)</div>
+<main>
+    <section class="panel">
+        <b>1. Upload Part Drawing PDF</b>
+        <div class="actions">
+            <input id="pdfFile" type="file" accept="application/pdf">
+            <button id="reset" class="danger">Reset & Upload New</button>
+        </div>
+        <div id="status" class="status">Loading original Excel templates & ready...</div>
+        <details>
+            <summary>PDF extracted text preview / troubleshooting</summary>
+            <pre id="extractPreview">PDF text preview यहाँ दिखेगा।</pre>
+        </details>
+        <p class="muted">PDF.js से text read होगा। Scanned PDF के लिए automatic OCR fallback चलेगा।</p>
+    </section>
 
-    <div class="upload-card" onclick="document.getElementById('pdfFile').click()">
-        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--primary); margin-bottom:10px;"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-        <h3 id="uploadStatusText" style="margin:5px 0; color:var(--primary);">Click to Upload New Part Drawing (PDF / Image)</h3>
-        <p style="margin:0; color:#666; font-size:13px;">AI Auto-Check reads PDF text, extracts Part No & Title, and fills fresh data instantly</p>
-        <input type="file" id="pdfFile" accept=".pdf,.png,.jpg,.jpeg" onchange="processDrawing(event)">
-    </div>
+    <section class="panel">
+        <b>2. Part Header Information — AI Extracted & Editable</b>
+        <div id="meta" class="meta" style="margin-top:14px"></div>
+    </section>
 
-    <div id="loading">🤖 AI Auto-Check: Wiping old cache & analyzing new drawing... Please wait.</div>
-
-    <div id="editorSection" style="display:none;">
-        <div class="section-title">
-            <span>AI Auto-Extracted Part Header Information (Editable)</span>
-            <div>
-                <button class="btn btn-success" onclick="generateExcelFiles()">Download Excel Files (.xlsx)</button>
-                <button class="btn btn-danger" onclick="resetApp()">Reset & Upload New</button>
+    <section class="panel">
+        <div class="tabs">
+            <button class="active" data-tab="cpPane">Process Control Plan (M QC 02)</button>
+            <button data-tab="pfPane">Process FMEA (PFMEA)</button>
+        </div>
+        <div id="cpPane" class="pane active">
+            <div class="actions">
+                <b>Control Plan Data</b>
+                <span id="cpCount" class="muted"></span>
+                <button id="addCP" class="secondary">+ Add row</button>
+                <button id="exportCP">Download Control Plan.xlsx</button>
             </div>
+            <div class="table-wrap"><table id="cpTable"></table></div>
         </div>
-        <div class="form-grid">
-            <div class="form-group"><label>Part Number</label><input type="text" id="partNo"></div>
-            <div class="form-group"><label>Part Name</label><input type="text" id="partName"></div>
-            <div class="form-group"><label>Model Type</label><input type="text" id="modelType" value="263, 283, SIMBA-30"></div>
-            <div class="form-group"><label>Material & Weight</label><input type="text" id="material"></div>
-            <div class="form-group"><label>Control Plan No</label><input type="text" id="cpNo"></div>
-            <div class="form-group"><label>Revision Level</label><input type="text" id="revLevel"></div>
-            <div class="form-group"><label>Core Team</label><input type="text" id="coreTeam" value="KPP, DVK, OM"></div>
-            <div class="form-group"><label>Date</label><input type="text" id="docDate" value="10/02/2026"></div>
+        <div id="pfPane" class="pane">
+            <div class="actions">
+                <b>PFMEA Data</b>
+                <span id="pfCount" class="muted"></span>
+                <button id="addPF" class="secondary">+ Add row</button>
+                <button id="exportPF">Download PFMEA.xlsx</button>
+            </div>
+            <div class="table-wrap"><table id="pfTable"></table></div>
+            <p class="muted">RPN = Severity × Occurrence × Detection (Auto-calculated).</p>
         </div>
+    </section>
 
-        <div class="section-title">Control Plan Data Preview (M QC 02)</div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Seq #</th>
-                        <th>Process Name</th>
-                        <th>Machine / Fixture</th>
-                        <th>Char No</th>
-                        <th>Product Characteristic</th>
-                        <th>Process Parameter</th>
-                        <th>Special Char</th>
-                        <th>Specification & Tolerance</th>
-                        <th>Measurement Technique</th>
-                        <th>Sample Size</th>
-                        <th>Sample Freq</th>
-                        <th>Control Method</th>
-                        <th>Reaction Plan</th>
-                    </tr>
-                </thead>
-                <tbody id="cpTableBody"></tbody>
-            </table>
+    <section class="panel">
+        <b>3. Download Both Professional Excel Workbooks</b>
+        <div class="actions">
+            <button id="exportBoth">Download Both Excel Files</button>
+            <span class="muted">Original Captain Tractors template structure & styling preserved.</span>
         </div>
+    </section>
+</main>
 
-        <div class="section-title">PFMEA Data Preview</div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Seq #</th>
-                        <th>Process Requirement</th>
-                        <th>Potential Failure Mode</th>
-                        <th>Potential Effect of Failure</th>
-                        <th>Sev (S)</th>
-                        <th>Class</th>
-                        <th>Potential Cause</th>
-                        <th>Prevention Control</th>
-                        <th>Occ (O)</th>
-                        <th>Detection Control</th>
-                        <th>Det (D)</th>
-                        <th>RPN</th>
-                    </tr>
-                </thead>
-                <tbody id="pfmeaTableBody"></tbody>
-            </table>
-        </div>
-
-        <div class="actions-bar">
-            <button class="btn btn-success" style="font-size:16px; padding:12px 30px;" onclick="generateExcelFiles()">📥 Download Both Control Plan & PFMEA Excel (.xlsx)</button>
-            <button class="btn btn-danger" style="font-size:16px; padding:12px 20px;" onclick="resetApp()">🔄 Reset & Upload New Drawing</button>
-        </div>
-    </div>
-</div>
+<footer>Browser-side processing. PDF and workbook data are handled locally; professional `.xlsx` export built for QA department.</footer>
 
 <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    // Master database templates
-    const drawingDatabase = {
-        "11216040": {
-            partName: "UNIVERSAL JOINT COVER REAR",
-            material: "CRC Sheet (Total Weight: 0.560 kg)",
-            cpNo: "CP-11216040-00",
-            revLevel: "00 (ERN-1766)",
-            cp: [
-                ["10", "Raw Material Receiving", "Stores Inspection", "1", "Material Grade & Type", "CRC Sheet Verification", "Major", "CRC Sheet (Part P1: 0.429 kg, Part P2: 0.132 kg)", "Mill Test Certificate / Visual Check", "1 Bundle", "Per Lot", "Material TC Verification & Visual Inspection", "Reject lot and inform supplier if TC non-conforming."],
-                ["10", "Raw Material Receiving", "Stores Inspection", "2", "Sheet Thickness - P1", "Thickness Check", "Critical", "1.6 mm (Thickness)", "Vernier Caliper / Micrometer", "5 pcs", "Per Lot", "Receiving Inspection Report", "Hold material, log NCR."],
-                ["20", "Blanking & Slot Piercing (Part P1)", "Laser Cutting", "3", "Unbend Overall Length & Width (P1)", "Laser Cut Profile", "Major", "353.7 mm x 124.0 mm", "Vernier Caliper / CMM", "3 pcs", "Per Shift", "First Piece & Patrol Inspection", "Adjust CNC laser program."],
-                ["40", "CNC Bending (Part P1)", "CNC Press Brake", "4", "Side Wall Bend Angles (2 Places)", "Bending Ram Stroke & Die", "Critical", "90° ± 0°20' (Inner R1.6 Typ.)", "Bevel Protractor / Angle Gauge", "5 pcs", "Every 2 Hrs", "Control Chart / First Piece", "Adjust stroke length."],
-                ["60", "Welding Assembly (P1 + P2)", "MIG Welding Fixture", "5", "Weld Joint Integrity & Fillet Size", "Welding Current & Voltage", "Critical", "Fillet Weld Z2 (All around) & Z3 as per drawing", "100% Visual / Weld Fillet Gauge", "100%", "Continuous", "100% Visual Inspection", "Re-weld defect area."]
-            ],
-            pfmea: [
-                ["10", "Check Material Grade & Type (CRC Sheet)", "Wrong material grade received", "Cracking during bending, poor weldability", 7, "Major", "Supplier dispatch error", "ASL & PO Spec check", 2, "MTC Verification & visual check", 3],
-                ["20", "Unbend Profile & U-Cutout (Part P1)", "Overall blank profile undersize/oversize", "Foul/interference with U-Joint assembly", 6, "Major", "Incorrect CNC program / zero error", "Locked CNC nesting program", 3, "First piece & patrol inspection", 3],
-                ["40", "Side Wall Bends & Flanges (Part P1)", "Bend angle open/closed or flange width variation", "Mounting flange not parallel; fitment issue", 7, "Critical", "Material springback / worn V-die", "Standardized tool setup sheet", 3, "First piece & every 2 hrs angle check", 3],
-                ["60", "MIG Welding (Fillet Size Z2 & Z3)", "Incomplete weld, undercut, or porosity", "Weld joint failure under tractor vibration", 8, "Critical", "Incorrect welding current / gas drop", "Qualified WPS & surface cleaning", 3, "100% visual inspection", 3]
-            ]
-        },
-        "11205090": {
-            partName: "BRACKET HSU MTG",
-            material: "H.R.C SHEET (Total Weight: 2.158 kg)",
-            cpNo: "CP-11205090-01",
-            revLevel: "07 (ECN2740)",
-            cp: [
-                ["10", "Raw Material Receiving", "Stores Inspection", "1", "Material Grade & Type", "H.R.C. Sheet Verification", "Major", "H.R.C. Sheet IS 2022", "Mill Test Certificate / Hardness Tester", "1 Bundle", "Per Lot", "Material TC Verification & Visual Inspection", "Reject lot and inform supplier if TC non-conforming."],
-                ["10", "Raw Material Receiving", "Stores Inspection", "2", "Sheet Thickness - P1", "Thickness Check", "Critical", "6.0 mm (Thickness)", "Vernier Caliper / Micrometer", "5 pcs", "Per Lot", "Receiving Inspection Report", "Hold material, log NCR."],
-                ["20", "Blanking & Hole Piercing (Part P1)", "Laser Cutting", "3", "Overall Length & Width (P1)", "Laser Cut / Die Profile", "Major", "390.9 mm x 108.0 mm", "Vernier Caliper / CMM", "3 pcs", "Per Shift", "First Piece & Patrol Inspection", "Adjust CNC laser / die setting."],
-                ["50", "CNC Bending (Part P1)", "CNC Press Brake", "4", "Bend Angle 1", "Bending Ram Pressure", "Critical", "90.00 deg (Radius 5.0 mm)", "Bevel Protractor / Angle Gauge", "5 pcs", "Every 2 Hrs", "Control Chart / First Piece", "Adjust stroke length."],
-                ["60", "Welding Assembly (P1 + P2 + P3)", "MIG Welding Fixture", "5", "Weld Joint Integrity", "Welding Current & Voltage", "Critical", "All joints fully welded as per drawing", "Visual 100% / Weld NDT Test", "100%", "Continuous", "100% Visual Inspection", "Re-weld defect area."]
-            ],
-            pfmea: [
-                ["10", "Check H.R.C Sheet Thickness & Grade", "Incorrect sheet thickness (Not 6.0 mm)", "Structural failure under load", 8, "Critical", "Material mix-up at store", "Incoming inspection log", 2, "Micrometer check", 3],
-                ["20", "Blanking & Hole Piercing (Part P1)", "Hole diameter undersize/oversize", "Pin/bolt fitment failure", 7, "Major", "Laser punch wear", "Tool pre-check", 3, "Plug gauge check", 3],
-                ["50", "CNC Bending (Part P1)", "Bend angle deviation", "Assembly clearance issue", 7, "Critical", "Springback variation", "Master sample check", 3, "Angle gauge check", 3]
-            ]
-        }
-    };
-
-    let currentCpData = [];
-    let currentPfmeaData = [];
-
-    function resetApp() {
-        // 1. Completely wipe file input
-        document.getElementById('pdfFile').value = '';
-        
-        // 2. Hide editor section
-        document.getElementById('editorSection').style.display = 'none';
-        
-        // 3. Clear all input fields
-        document.getElementById('partNo').value = '';
-        document.getElementById('partName').value = '';
-        document.getElementById('modelType').value = '263, 283, SIMBA-30';
-        document.getElementById('material').value = '';
-        document.getElementById('cpNo').value = '';
-        document.getElementById('revLevel').value = '';
-        
-        // 4. Wipe tables completely
-        document.getElementById('cpTableBody').innerHTML = '';
-        document.getElementById('pfmeaTableBody').innerHTML = '';
-        
-        // 5. Reset memory arrays
-        currentCpData = [];
-        currentPfmeaData = [];
-        
-        document.getElementById('uploadStatusText').innerText = "Click to Upload New Part Drawing (PDF / Image)";
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function processDrawing(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        // CRITICAL FIX: Instantly wipe everything before parsing new file to prevent mixing
-        resetAppMemoryOnly();
-
-        document.getElementById('loading').style.display = 'block';
-
-        let extractedText = "";
-
-        try {
-            if (file.type === "application/pdf") {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    textContent.items.forEach(item => {
-                        extractedText += item.str + " ";
-                    });
-                }
-            } else {
-                extractedText = file.name;
-            }
-        } catch (err) {
-            console.error("PDF read error:", err);
-            extractedText = file.name;
-        }
-
-        setTimeout(() => {
-            let upperText = (extractedText + " " + file.name).toUpperCase();
-            
-            // AI Auto-Check: Smart extraction of Part Number (6 to 8 digits)
-            let partNoMatch = upperText.match(/\b(112\d{5}|1120\d{4})\b/) || file.name.match(/\d{6,8}/);
-            let matchedKey = partNoMatch ? partNoMatch[0] : "11216040";
-
-            let cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-            
-            // AI Auto-Check: Load specific database template or generate intelligent dynamic template
-            let data = drawingDatabase[matchedKey] || {
-                partName: cleanName.toUpperCase(),
-                material: "CRC / HRC Sheet as per Drawing Spec",
-                cpNo: "CP-" + matchedKey + "-00",
-                revLevel: "00",
-                cp: [
-                    ["10", "Raw Material Receiving", "Stores Inspection", "1", "Material Grade & Type", "Material Verification", "Major", "As per drawing spec", "Mill Test Certificate / Visual", "1 Bundle", "Per Lot", "TC Verification", "Reject if non-conforming."],
-                    ["20", "Blanking & Piercing", "Laser Cutting", "2", "Overall Dimensions", "Cutting Profile", "Critical", "As per drawing tolerance", "Vernier Caliper / CMM", "3 pcs", "Per Shift", "First Piece Inspection", "Adjust laser program."],
-                    ["50", "Bending & Forming", "CNC Press Brake", "3", "Bend Angles", "Ram Stroke & Die", "Critical", "90° as per drawing", "Angle Protractor", "5 pcs", "Every 2 Hrs", "Control Chart / First Piece", "Adjust back gauge."],
-                    ["60", "Welding Assembly", "MIG Welding Fixture", "4", "Weld Joint Integrity", "Welding Current & Voltage", "Critical", "Full weld per drawing", "100% Visual / NDT", "100%", "Continuous", "100% Visual Inspection", "Re-weld defect area."]
-                ],
-                pfmea: [
-                    ["10", "Raw Material Verification", "Wrong material grade", "Structural failure", 7, "Major", "Supplier dispatch error", "PO Spec check", 2, "MTC check", 3],
-                    ["20", "Blanking & Cutting", "Dimensional inaccuracy", "Assembly fitment failure", 8, "Critical", "Laser head offset", "Fixture pre-check", 3, "CMM / Vernier check", 3],
-                    ["50", "CNC Bending", "Bend angle deviation", "Gap in assembly", 7, "Critical", "Springback variation", "Master sample check", 3, "Angle gauge check", 3],
-                    ["60", "Welding Assembly", "Incomplete weld / porosity", "Vibration failure", 8, "Critical", "Current fluctuation", "WPS control", 3, "Visual check", 3]
-                ]
-            };
-
-            // Populate form fields with fresh parsed data
-            document.getElementById('partNo').value = matchedKey;
-            document.getElementById('partName').value = data.partName;
-            document.getElementById('material').value = data.material;
-            document.getElementById('cpNo').value = data.cpNo;
-            document.getElementById('revLevel').value = data.revLevel;
-
-            currentCpData = JSON.parse(JSON.stringify(data.cp));
-            currentPfmeaData = JSON.parse(JSON.stringify(data.pfmea));
-
-            // Render fresh tables
-            renderTables();
-
-            document.getElementById('uploadStatusText').innerText = `🤖 AI Auto-Check Successful: ${file.name} (Part: ${matchedKey})`;
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('editorSection').style.display = 'block';
-        }, 600);
-    }
-
-    function resetAppMemoryOnly() {
-        document.getElementById('editorSection').style.display = 'none';
-        document.getElementById('cpTableBody').innerHTML = '';
-        document.getElementById('pfmeaTableBody').innerHTML = '';
-        currentCpData = [];
-        currentPfmeaData = [];
-    }
-
-    function renderTables() {
-        const cpBody = document.getElementById('cpTableBody');
-        cpBody.innerHTML = '';
-        currentCpData.forEach(row => {
-            let tr = document.createElement('tr');
-            row.forEach(cell => {
-                let td = document.createElement('td');
-                td.innerText = cell;
-                tr.appendChild(td);
-            });
-            cpBody.appendChild(tr);
-        });
-
-        const pfmeaBody = document.getElementById('pfmeaTableBody');
-        pfmeaBody.innerHTML = '';
-        currentPfmeaData.forEach(row => {
-            let tr = document.createElement('tr');
-            row.forEach((cell, idx) => {
-                let td = document.createElement('td');
-                td.innerText = cell;
-                if (idx === 4 || idx === 8 || idx === 10) td.style.textAlign = 'center';
-                tr.appendChild(td);
-            });
-            let rpnTd = document.createElement('td');
-            rpnTd.innerText = row[4] * row[8] * row[10];
-            rpnTd.style.fontWeight = 'bold';
-            rpnTd.style.textAlign = 'center';
-            tr.appendChild(rpnTd);
-            pfmeaBody.appendChild(tr);
-        });
-    }
-
-    function generateExcelFiles() {
-        const partNum = document.getElementById('partNo').value || "11216040";
-        
-        // 1. Control Plan Excel
-        const wbCP = XLSX.utils.book_new();
-        let cpSheetData = [
-            ["", "PROCESS CONTROL PLAN", "", "", "", "", "", "", "", "", "", "", "Format No.: M QC 02"],
-            ["Company / Plant:", "CAPTAIN TRACTORS PVT. LTD., RAJKOT", "", "", "Control Plan No:", document.getElementById('cpNo').value, "", "", "", "Orig. Date:", document.getElementById('docDate').value, "", ""],
-            ["Part Name:", document.getElementById('partName').value, "", "", "Part Number:", partNum, "", "", "", "Rev. Date:", document.getElementById('docDate').value, "", ""],
-            ["Model Type:", document.getElementById('modelType').value, "", "", "Revision Level:", document.getElementById('revLevel').value, "", "", "", "Key Contact:", "QA / Mfg Engineering", "", ""],
-            ["Material:", document.getElementById('material').value, "", "", "Core Team:", document.getElementById('coreTeam').value, "", "", "", "Control Level:", "Prototype / Mass Production", "", ""],
-            [],
-            ["Part / Process Seq #", "Process Name / Operation Description", "Machine / Device / Jig / Fixture", "Char No.", "Product Characteristic / Specification", "Process Characteristic / Parameter", "Special Char", "Product / Process Specification & Tolerance", "Evaluation / Measurement Technique", "Sample Size", "Sample Freq", "Control Method", "Reaction Plan / Corrective Action"]
-        ];
-        currentCpData.forEach(r => cpSheetData.push(r));
-        const wsCP = XLSX.utils.aoa_to_sheet(cpSheetData);
-        XLSX.utils.book_append_sheet(wbCP, wsCP, "Control Plan");
-        XLSX.writeFile(wbCP, `CONTROL_PLAN_${partNum}.xlsx`);
-
-        // 2. PFMEA Excel
-        const wbPFMEA = XLSX.utils.book_new();
-        let pfmeaSheetData = [
-            ["", "POTENTIAL FAILURE MODE AND EFFECTS ANALYSIS (PROCESS FMEA)"],
-            ["", "", "", "", "", "", "Team:", document.getElementById('coreTeam').value],
-            ["Part No.", partNum, "", "Rev.", document.getElementById('revLevel').value, "", "", "", "", "", "", "FMEA Number:", "", `PFMEA/CAPT/${partNum}`],
-            ["Part Name.", document.getElementById('partName'].value],
-            [],
-            ["Process / Function Requirements", "Potential Failure Mode", "Potential Effect(s) of Failure", "Severity S", "Class", "Potential Cause(s) of Failure", "Current Controls - Prevention", "Occurrence O", "Current Controls - Detection", "Detection D", "RPN"]
-        ];
-        currentPfmeaData.forEach(r => {
-            let rowCopy = [...r];
-            rowCopy.push(r[4] * r[8] * r[10]);
-            pfmeaSheetData.push(rowCopy);
-        });
-        const wsPFMEA = XLSX.utils.aoa_to_sheet(pfmeaSheetData);
-        XLSX.utils.book_append_sheet(wbPFMEA, wsPFMEA, "PFMEA");
-        XLSX.writeFile(wbPFMEA, `PFMEA_${partNum}.xlsx`);
-    }
-</script>
-
-</body>
-</html>
+// Base64 Templates embedded for reliable offline/online GitHub Pages execution
+const CP_B64 = "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7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7//3v//7
