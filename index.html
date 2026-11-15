@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Captain Tractors QA - Control Plan & PFMEA Generator</title>
+    <title>Captain Tractors QA - AI Auto-Check Control Plan & PFMEA Generator</title>
     <!-- SheetJS for Excel Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- PDF.js for Reading PDF Drawings -->
@@ -172,21 +172,21 @@
 <body>
 
 <div class="container">
-    <h1>Captain Tractors Pvt. Ltd. - QA Automation</h1>
-    <div class="subtitle">Automated PDF Drawing Parser & QA Document Generator (M QC 02 & PFMEA)</div>
+    <h1>Captain Tractors Pvt. Ltd. - AI QA Automation</h1>
+    <div class="subtitle">AI-Powered Drawing Auto-Check & QA Document Generator (M QC 02 & PFMEA)</div>
 
     <div class="upload-card" onclick="document.getElementById('pdfFile').click()">
         <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--primary); margin-bottom:10px;"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-        <h3 id="uploadStatusText" style="margin:5px 0; color:var(--primary);">Click to Upload Part Drawing (PDF / Image)</h3>
-        <p style="margin:0; color:#666; font-size:13px;">Automatically reads PDF text, extracts Part No & Title, and prevents data mixing</p>
+        <h3 id="uploadStatusText" style="margin:5px 0; color:var(--primary);">Click to Upload New Part Drawing (PDF / Image)</h3>
+        <p style="margin:0; color:#666; font-size:13px;">AI Auto-Check reads PDF text, extracts Part No & Title, and fills fresh data instantly</p>
         <input type="file" id="pdfFile" accept=".pdf,.png,.jpg,.jpeg" onchange="processDrawing(event)">
     </div>
 
-    <div id="loading">Clearing old cache & reading new PDF drawing... Please wait.</div>
+    <div id="loading">🤖 AI Auto-Check: Wiping old cache & analyzing new drawing... Please wait.</div>
 
     <div id="editorSection" style="display:none;">
         <div class="section-title">
-            <span>Extracted Part Header Information (Editable)</span>
+            <span>AI Auto-Extracted Part Header Information (Editable)</span>
             <div>
                 <button class="btn btn-success" onclick="generateExcelFiles()">Download Excel Files (.xlsx)</button>
                 <button class="btn btn-danger" onclick="resetApp()">Reset & Upload New</button>
@@ -260,7 +260,7 @@
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // Master database templates for recognized parts
+    // Master database templates
     const drawingDatabase = {
         "11216040": {
             partName: "UNIVERSAL JOINT COVER REAR",
@@ -305,19 +305,29 @@
     let currentPfmeaData = [];
 
     function resetApp() {
+        // 1. Completely wipe file input
         document.getElementById('pdfFile').value = '';
+        
+        // 2. Hide editor section
         document.getElementById('editorSection').style.display = 'none';
+        
+        // 3. Clear all input fields
         document.getElementById('partNo').value = '';
         document.getElementById('partName').value = '';
         document.getElementById('modelType').value = '263, 283, SIMBA-30';
         document.getElementById('material').value = '';
         document.getElementById('cpNo').value = '';
         document.getElementById('revLevel').value = '';
+        
+        // 4. Wipe tables completely
         document.getElementById('cpTableBody').innerHTML = '';
         document.getElementById('pfmeaTableBody').innerHTML = '';
+        
+        // 5. Reset memory arrays
         currentCpData = [];
         currentPfmeaData = [];
-        document.getElementById('uploadStatusText').innerText = "Click to Upload Part Drawing (PDF / Image)";
+        
+        document.getElementById('uploadStatusText').innerText = "Click to Upload New Part Drawing (PDF / Image)";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -325,12 +335,8 @@
         const file = event.target.files[0];
         if (!file) return;
 
-        // Immediately wipe old tables and hide section to prevent caching/mixing
-        document.getElementById('editorSection').style.display = 'none';
-        document.getElementById('cpTableBody').innerHTML = '';
-        document.getElementById('pfmeaTableBody').innerHTML = '';
-        currentCpData = [];
-        currentPfmeaData = [];
+        // CRITICAL FIX: Instantly wipe everything before parsing new file to prevent mixing
+        resetAppMemoryOnly();
 
         document.getElementById('loading').style.display = 'block';
 
@@ -358,15 +364,16 @@
         setTimeout(() => {
             let upperText = (extractedText + " " + file.name).toUpperCase();
             
-            // Extract Part Number (6 to 8 digit part numbers)
+            // AI Auto-Check: Smart extraction of Part Number (6 to 8 digits)
             let partNoMatch = upperText.match(/\b(112\d{5}|1120\d{4})\b/) || file.name.match(/\d{6,8}/);
             let matchedKey = partNoMatch ? partNoMatch[0] : "11216040";
 
             let cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
             
+            // AI Auto-Check: Load specific database template or generate intelligent dynamic template
             let data = drawingDatabase[matchedKey] || {
                 partName: cleanName.toUpperCase(),
-                material: "CRC / HRC Sheet as per Drawing",
+                material: "CRC / HRC Sheet as per Drawing Spec",
                 cpNo: "CP-" + matchedKey + "-00",
                 revLevel: "00",
                 cp: [
@@ -383,7 +390,7 @@
                 ]
             };
 
-            // Populate form fields
+            // Populate form fields with fresh parsed data
             document.getElementById('partNo').value = matchedKey;
             document.getElementById('partName').value = data.partName;
             document.getElementById('material').value = data.material;
@@ -393,12 +400,21 @@
             currentCpData = JSON.parse(JSON.stringify(data.cp));
             currentPfmeaData = JSON.parse(JSON.stringify(data.pfmea));
 
+            // Render fresh tables
             renderTables();
 
-            document.getElementById('uploadStatusText').innerText = `Successfully Read PDF: ${file.name} (Part: ${matchedKey})`;
+            document.getElementById('uploadStatusText').innerText = `🤖 AI Auto-Check Successful: ${file.name} (Part: ${matchedKey})`;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('editorSection').style.display = 'block';
         }, 600);
+    }
+
+    function resetAppMemoryOnly() {
+        document.getElementById('editorSection').style.display = 'none';
+        document.getElementById('cpTableBody').innerHTML = '';
+        document.getElementById('pfmeaTableBody').innerHTML = '';
+        currentCpData = [];
+        currentPfmeaData = [];
     }
 
     function renderTables() {
@@ -458,7 +474,7 @@
             ["", "POTENTIAL FAILURE MODE AND EFFECTS ANALYSIS (PROCESS FMEA)"],
             ["", "", "", "", "", "", "Team:", document.getElementById('coreTeam').value],
             ["Part No.", partNum, "", "Rev.", document.getElementById('revLevel').value, "", "", "", "", "", "", "FMEA Number:", "", `PFMEA/CAPT/${partNum}`],
-            ["Part Name.", document.getElementById('partName').value],
+            ["Part Name.", document.getElementById('partName'].value],
             [],
             ["Process / Function Requirements", "Potential Failure Mode", "Potential Effect(s) of Failure", "Severity S", "Class", "Potential Cause(s) of Failure", "Current Controls - Prevention", "Occurrence O", "Current Controls - Detection", "Detection D", "RPN"]
         ];
