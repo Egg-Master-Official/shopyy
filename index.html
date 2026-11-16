@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Captain Tractors | Drawing Intelligence Workbench</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="https://unpkg.com/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root {
@@ -519,7 +519,6 @@ const META_FIELDS = [
   { key: "approvedBy", label: "Approved By" }
 ];
 
-// DOM Elements
 const el = {
   pdfFile: document.getElementById("pdfFile"),
   uploadBtn: document.getElementById("uploadBtn"),
@@ -541,7 +540,6 @@ function setStatus(msg, type = "") {
   el.status.className = "status-bar" + (type ? " " + type : "");
 }
 
-// Render Editable Metadata Inputs
 function renderMeta() {
   el.metaGrid.innerHTML = "";
   META_FIELDS.forEach(f => {
@@ -555,7 +553,6 @@ function renderMeta() {
   });
 }
 
-// Render Control Plan Table
 function renderCP() {
   el.cpCount.textContent = `(${state.cpRows.length} operations)`;
   const headers = [
@@ -603,7 +600,6 @@ function renderCP() {
   });
 }
 
-// Render PFMEA Table
 function renderPF() {
   el.pfCount.textContent = `(${state.pfRows.length} failure modes)`;
   const headers = [
@@ -678,7 +674,6 @@ function getRpnClass(val) {
 window.deleteCPRow = (idx) => { state.cpRows.splice(idx, 1); renderCP(); };
 window.deletePFRow = (idx) => { state.pfRows.splice(idx, 1); renderPF(); };
 
-// PDF Extraction + OCR Pipeline
 async function processPDF(file) {
   if (!file) return;
   el.fileName.textContent = file.name;
@@ -696,9 +691,8 @@ async function processPDF(file) {
       fullText += `\n--- PAGE ${p} ---\n` + pageText;
     }
 
-    // Fallback to Tesseract OCR if PDF is scanned / image-only
     if (fullText.replace(/--- PAGE \d+ ---/g, "").trim().length < 40) {
-      setStatus("Scanned drawing detected. Running Tesseract OCR on pages (please wait)...", "warn");
+      setStatus("Scanned drawing detected. Running Tesseract OCR on pages...", "warn");
       fullText = "";
       for (let p = 1; p <= Math.min(pdf.numPages, 3); p++) {
         const page = await pdf.getPage(p);
@@ -729,18 +723,15 @@ async function processPDF(file) {
   }
 }
 
-// Intelligent Engineering Parser
 function parseDrawingAndPopulate(rawText, fileName) {
   const clean = rawText.replace(/\s+/g, " ");
 
-  // 1. Extract Part Number (e.g. 008018453Y91.005 or alphanumeric drawing codes)
   const partNoMatch =
     clean.match(/\b([0-9]{6,12}[A-Z0-9.\-]{2,10})\b/i) ||
     clean.match(/(?:PART\s*NO|DRG\s*NO|DWG\s*NO)[.:\s#-]*([A-Z0-9.\-_/]+)/i) ||
     fileName.match(/([0-9A-Z.\-_]{6,20})/i);
   state.meta.partNo = partNoMatch ? partNoMatch[1].toUpperCase() : "008018453Y91.005";
 
-  // 2. Extract Part Name
   const nameMatch =
     clean.match(/(?:PART\s*NAME|DESCRIPTION|TITLE)[.:\s-]*([A-Z0-9\s\-/()]{4,45}?)(?=\s+(?:MAT|MATERIAL|DRG|PART|SCALE|QTY|REV|TOL|DATE))/i) ||
     clean.match(/\b([A-Z\s]{3,25}(?:BRACKET|ASSEMBLY|ASSY|PLATE|HOUSING|SHAFT|LEVER|COVER|FLANGE|PIN|SUPPORT))\b/i);
@@ -748,21 +739,17 @@ function parseDrawingAndPopulate(rawText, fileName) {
     ? nameMatch[1].trim().toUpperCase()
     : fileName.replace(/\.pdf$/i, "").replace(/[_-]+/g, " ").toUpperCase();
 
-  // 3. Extract Material
   const matMatch =
     clean.match(/(?:MATERIAL|MATL|MAT)[.:\s-]*([A-Z0-9\s\-./]{3,30}?)(?=\s+(?:THK|THICKNESS|FINISH|WEIGHT|QTY|REV|SCALE|TOL|HARDNESS|DATE))/i) ||
     clean.match(/\b(IS\s*2062(?:\s*E250)?|IS\s*513|CRCA|HR\s*SHEET|SS\s*304|EN8|EN19|C45|MS\s*PLATE)\b/i);
   state.meta.material = matMatch ? matMatch[1].trim().toUpperCase() : "IS 2062 E250 / MS SHEET";
 
-  // 4. Extract Revision
   const revMatch = clean.match(/(?:REV|REVISION)[.:\s-]*([0-9A-Z]{1,3})\b/i);
   if (revMatch) state.meta.drgRev = revMatch[1].toUpperCase();
 
-  // 5. Extract Sheet Thickness
   const thkMatch = clean.match(/(?:THK|THICKNESS|SHEET)[.:\s-]*(\d+(?:\.\d+)?)\s*(?:MM)?/i) || clean.match(/\b(\d+(?:\.\d+)?)\s*MM\s*THK/i);
   const thickness = thkMatch ? `${thkMatch[1]} mm` : "4.0 mm";
 
-  // 6. Detect Geometric & Manufacturing Features
   const dimMatches = [...clean.matchAll(/(\d+(?:\.\d+)?)\s*(?:±|\+\/-)\s*(\d+(?:\.\d+)?)/g)].slice(0, 4);
   const holeMatches = [...clean.matchAll(/(?:Ø|DIA|HOLE)\s*(\d+(?:\.\d+)?)/gi)].slice(0, 3);
   const bendMatches = [...clean.matchAll(/(\d{2,3})\s*°/g)].slice(0, 2);
@@ -770,12 +757,10 @@ function parseDrawingAndPopulate(rawText, fileName) {
   const hasWeld = /\b(WELD|MIG|FILLET|TACK)\b/i.test(clean) || /ASSY|ASSEMBLY/i.test(state.meta.partName);
   const hasThread = /\b(M\d+\s*[xX×]\s*\d+(?:\.\d+)?|TAP|THREAD)\b/i.test(clean);
 
-  // Build Control Plan & PFMEA Rows dynamically
   const cp = [];
   const pf = [];
   let opCounter = 10;
 
-  // Op 10: Raw Material Inspection
   cp.push({
     opNo: String(opCounter),
     processName: "Raw Material Receiving Inspection",
@@ -821,7 +806,6 @@ function parseDrawingAndPopulate(rawText, fileName) {
     actSev: 8, actOcc: 2, actDet: 2
   });
 
-  // Op 20: Laser / CNC Shearing & Blank Cutting
   opCounter += 10;
   const profileSpec = dimMatches.length
     ? dimMatches.map(m => `${m[1]} ± ${m[2]} mm`).join("; ")
@@ -856,7 +840,6 @@ function parseDrawingAndPopulate(rawText, fileName) {
     actSev: 6, actOcc: 2, actDet: 3
   });
 
-  // Op 30: Hole Punching / Drilling / Slotting
   opCounter += 10;
   const holeText = holeMatches.length
     ? holeMatches.map(h => `Ø${h[1]} mm`).join(", ") + (hasSlot ? " & Mounting Slots" : "")
@@ -891,7 +874,6 @@ function parseDrawingAndPopulate(rawText, fileName) {
     actSev: 7, actOcc: 2, actDet: 2
   });
 
-  // Op 40: Tapping (if detected)
   if (hasThread) {
     opCounter += 10;
     const threadSpec = (clean.match(/\b(M\d+\s*[xX×]\s*\d+(?:\.\d+)?)\b/i) || ["", "M10 x 1.5 - 6H"])[1];
@@ -912,7 +894,6 @@ function parseDrawingAndPopulate(rawText, fileName) {
     });
   }
 
-  // Op 50: Press Brake Bending
   opCounter += 10;
   const bendAngle = bendMatches.length ? bendMatches.map(b => `${b[1]}° ± 1°`).join(", ") : "90° ± 1° (As per Drg)";
   cp.push({
@@ -945,7 +926,6 @@ function parseDrawingAndPopulate(rawText, fileName) {
     actSev: 7, actOcc: 3, actDet: 3
   });
 
-  // Op 60: Robotic / MIG Welding (if assembly/weld detected)
   if (hasWeld) {
     opCounter += 10;
     const weldSize = (clean.match(/(?:FILLET|WELD|LEG)\s*(\d+(?:\.\d+)?)\s*MM/i) || ["", "4.0"])[1];
@@ -980,7 +960,6 @@ function parseDrawingAndPopulate(rawText, fileName) {
     });
   }
 
-  // Op 70: Surface Treatment & Final PDI
   opCounter += 10;
   cp.push({
     opNo: String(opCounter),
@@ -1019,7 +998,6 @@ function parseDrawingAndPopulate(rawText, fileName) {
   renderPF();
 }
 
-// Excel Export Helpers using ExcelJS
 function applyCellBorder(cell) {
   cell.border = {
     top: { style: "thin", color: { argb: "FF94A3B8" } },
@@ -1066,6 +1044,10 @@ function addRevisionSheet(wb, docTitle) {
 }
 
 async function exportControlPlanExcel() {
+  if (typeof ExcelJS === "undefined") {
+    alert("ExcelJS library not loaded yet. Please check your internet connection.");
+    return;
+  }
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Control Plan (M QC 02)", {
     pageSetup: { orientation: "landscape", paperSize: 9, fitToPage: true, fitToWidth: 1 }
@@ -1077,7 +1059,6 @@ async function exportControlPlanExcel() {
     { width: 24 }, { width: 13 }, { width: 15 }, { width: 22 }, { width: 25 }
   ];
 
-  // Title Banner
   ws.mergeCells("A1:M1");
   const c1 = ws.getCell("A1");
   c1.value = "CAPTAIN TRACTORS PVT. LTD. — PROCESS CONTROL PLAN";
@@ -1086,7 +1067,6 @@ async function exportControlPlanExcel() {
   c1.alignment = { vertical: "middle", horizontal: "center" };
   ws.getRow(1).height = 30;
 
-  // Metadata Header Rows
   const metaRows = [
     ["Part Number:", state.meta.partNo, "", "Part Name:", state.meta.partName, "", "Doc. No.:", state.meta.docNo, "", "Rev. No. / Date:", `${state.meta.revNo} / ${state.meta.revDate}`, "", ""],
     ["Material Spec:", state.meta.material, "", "Drawing Rev.:", state.meta.drgRev, "", "Plant / Supplier:", state.meta.supplier, "", "Core Team:", state.meta.coreTeam, "", ""]
@@ -1110,9 +1090,8 @@ async function exportControlPlanExcel() {
     });
   });
 
-  ws.addRow([]); // Spacer row 4
+  ws.addRow([]);
 
-  // Table Headers (Row 5)
   const headers = [
     "Part / Process No.", "Process Name / Operation Description", "Machine, Device, Jig, Tools for Mfg.",
     "Char. No.", "Product Characteristic", "Process Characteristic", "Special Char. Class",
@@ -1129,7 +1108,6 @@ async function exportControlPlanExcel() {
     applyCellBorder(c);
   });
 
-  // Data Rows
   state.cpRows.forEach(r => {
     const row = ws.addRow([
       r.opNo, r.processName, r.machine, r.charNo,
@@ -1148,16 +1126,15 @@ async function exportControlPlanExcel() {
     });
   });
 
-  // Sign-off Footer
-  ws.addRow([]);
-  const signRow = ws.addRow(["Prepared By:", state.meta.preparedBy, "", "", "Approved By:", state.meta.approvedBy]);
-  signRow.eachCell(c => { c.font = { name: "Arial", size: 10, bold: true }; });
-
   addRevisionSheet(wb, "CONTROL PLAN");
   await downloadWorkbook(wb, `${state.meta.partNo || "Part"}_Control_Plan_${state.meta.docNo.replace(/\s+/g, "_")}.xlsx`);
 }
 
 async function exportPFMEAExcel() {
+  if (typeof ExcelJS === "undefined") {
+    alert("ExcelJS library not loaded yet. Please check your internet connection.");
+    return;
+  }
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("PFMEA", {
     pageSetup: { orientation: "landscape", paperSize: 9, fitToPage: true, fitToWidth: 1 }
@@ -1274,7 +1251,6 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-// Event Listeners
 el.uploadBtn.addEventListener("click", () => el.pdfFile.click());
 el.dropzone.addEventListener("click", () => el.pdfFile.click());
 
@@ -1323,7 +1299,6 @@ el.resetBtn.addEventListener("click", () => {
   setStatus("Workbench reset. Ready for new drawing upload.");
 });
 
-// Tab Switching
 document.querySelectorAll(".tabs button").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
@@ -1333,7 +1308,6 @@ document.querySelectorAll(".tabs button").forEach(btn => {
   });
 });
 
-// Add Row Buttons
 document.getElementById("addCPRowBtn").addEventListener("click", () => {
   const nextOp = (state.cpRows.length + 1) * 10;
   state.cpRows.push({
@@ -1353,15 +1327,13 @@ document.getElementById("addPFRowBtn").addEventListener("click", () => {
   renderPF();
 });
 
-// Export Buttons
 document.getElementById("exportCPBtn").addEventListener("click", exportControlPlanExcel);
 document.getElementById("exportPFBtn").addEventListener("click", exportPFMEAExcel);
 document.getElementById("exportBothBtn").addEventListener("click", async () => {
   await exportControlPlanExcel();
-  setTimeout(exportPFMEAExcel, 400);
+  setTimeout(exportPFMEAExcel, 600);
 });
 
-// Initialize Empty UI
 renderMeta();
 renderCP();
 renderPF();
